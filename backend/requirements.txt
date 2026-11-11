@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+PyJWT
+argon2-cffi
+openpyxl
+python-multipart
+reportlab
+psycopg2-binary
+python-dotenv

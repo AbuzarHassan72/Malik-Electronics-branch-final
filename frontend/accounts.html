@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Accounts</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/accounts.css?v=20260407-v21-ui-safe">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Professional stock, billing and account management for the shop owner.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+        <a class="nav-link" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link active" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+        
+      </nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+
+    <main class="main-area" id="accounts-main-container">
+      <header class="page-header" style="flex-wrap: wrap; gap: 14px;">
+        <div>
+          <h1 class="page-title" id="txt-acc-title">Financial Accounts &amp; Audit</h1>
+          <p class="page-subtitle" id="txt-acc-subtitle">Comprehensive transaction analysis, company performance, and multi-format reporting.</p>
+        </div>
+        <div class="page-tools">
+          <button class="btn-ghost small" type="button" id="btn-toggle-lang" style="font-weight: 800; border-color: var(--line);">اردو میں دیکھیں</button>
+          <button class="btn-ghost small" type="button" id="accounts-security-toggle" style="font-weight: 750;">Unlock accounts</button>
+          <div class="top-badge" data-user-name></div>
+        </div>
+      </header>
+
+      <!-- 1. PERIOD PRESETS AT VERY TOP -->
+      <section class="card" style="padding: 16px 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+          <div style="font-weight: 800; font-size: 0.88rem; color: var(--blue-dark); text-transform: uppercase; letter-spacing: 0.05em;" id="txt-label-period">Reporting Period</div>
+          <div class="inline-actions">
+            <button class="btn-accent small" type="button" id="btn-export-word">📄 Word Report (.doc)</button>
+            <button class="btn-dark small" type="button" id="btn-export-excel">📊 Excel (.xlsx)</button>
+          </div>
+        </div>
+
+        <div class="list-chips" id="period-presets-strip" style="gap: 8px;">
+          <button type="button" class="chip active" data-period="today" style="cursor: pointer; font-weight: 800;">Today</button>
+          <button type="button" class="chip" data-period="yesterday" style="cursor: pointer;">Yesterday</button>
+          <button type="button" class="chip" data-period="this_week" style="cursor: pointer;">This Week</button>
+          <button type="button" class="chip" data-period="last_week" style="cursor: pointer;">Last Week</button>
+          <button type="button" class="chip" data-period="this_month" style="cursor: pointer;">This Month</button>
+          <button type="button" class="chip" data-period="last_month" style="cursor: pointer;">Last Month</button>
+          <button type="button" class="chip" data-period="this_year" style="cursor: pointer;">This Year</button>
+          <button type="button" class="chip" data-period="all" style="cursor: pointer;">All Time</button>
+          <button type="button" class="chip" data-period="custom" style="cursor: pointer;">Custom Range</button>
+        </div>
+      </section>
+
+      <!-- 2. SUMMARY METRIC CARDS POSITIONED RIGHT AT THE TOP -->
+      <section style="margin-top: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h2 class="section-title" id="txt-summary-heading" style="font-size: 1.25rem;">Today's Financial Summary</h2>
+          <div class="badge info" id="txt-summary-period-badge" style="font-size: 0.82rem; font-weight: 700;"></div>
+        </div>
+        <div id="account-stats" class="auto-grid"></div>
+      </section>
+
+      <!-- 3. COMPANY FILTERS & SEARCH ROW POSITIONED BELOW SUMMARY CARDS -->
+      <section class="card" style="margin-top: 18px; padding: 18px;">
+        <form id="accounts-filter-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) auto; gap: 12px; align-items: end;">
+          <div class="field">
+            <label id="txt-filter-company" style="font-size: 0.8rem;">Company / Brand</label>
+            <select id="acc-company-filter" style="min-height: 44px;"></select>
+          </div>
+          <div class="field" id="wrap-start-date">
+            <label id="txt-filter-start" style="font-size: 0.8rem;">From Date</label>
+            <input id="acc-start-date" type="date" style="min-height: 44px;">
+          </div>
+          <div class="field" id="wrap-end-date">
+            <label id="txt-filter-end" style="font-size: 0.8rem;">To Date</label>
+            <input id="acc-end-date" type="date" style="min-height: 44px;">
+          </div>
+          <div class="field" style="min-width: 220px;">
+            <label id="txt-filter-search" style="font-size: 0.8rem;">Search Invoices / Party</label>
+            <input id="acc-search-input" type="text" placeholder="Invoice #, customer, phone..." style="min-height: 44px;">
+          </div>
+          <button class="btn" type="submit" id="btn-apply-filters" style="min-height: 44px;">Filter</button>
+        </form>
+      </section>
+
+      <!-- 4. COMPANY-WISE FINANCIAL BREAKDOWN -->
+      <section class="card" style="margin-top: 18px;">
+        <div class="section-title-row">
+          <div>
+            <h2 class="section-title" id="txt-company-analysis-title">Company-Wise Performance</h2>
+            <div class="notice-inline" id="txt-company-analysis-subtitle">Live breakdown across all brands registered in this branch for the selected period.</div>
+          </div>
+        </div>
+        <div id="company-analysis-table-wrap" style="overflow-x: auto; margin-top: 12px;"></div>
+      </section>
+
+      <!-- 5. INVOICES & TRANSACTIONS EXPLORER -->
+      <section class="card" style="margin-top: 18px;">
+        <div class="section-title-row" style="flex-wrap: wrap; gap: 12px;">
+          <div class="inline-actions" id="acc-tab-strip">
+            <button class="btn-ghost small active" type="button" data-acc-tab="sales_invoices" id="tab-btn-sales" style="font-weight: 800; border-color: var(--blue-dark);">Sales Invoices</button>
+            <button class="btn-ghost small" type="button" data-acc-tab="purchase_invoices" id="tab-btn-purchases">Purchase Invoices</button>
+          </div>
+          <div id="invoices-count-badge" class="badge info" style="font-size: 0.84rem;">0 Invoices</div>
+        </div>
+
+        <div id="accounts-invoices-list" style="margin-top: 14px;"></div>
+      </section>
+    </main>
+
+    <!-- DEDICATED ACCOUNTS UNLOCK MODAL (WITH MOBILE BIOMETRIC SUPPORT) -->
+    <div class="modal-backdrop no-print" id="accounts-unlock-modal">
+      <div class="modal small" style="max-width: 440px;">
+        <div class="modal-header">
+          <h2 id="acc-unlock-modal-title" style="color: var(--blue-dark); font-size: 1.25rem;">Accounts Protected</h2>
+          <button class="btn-ghost small" type="button" data-close-modal="accounts-unlock-modal">Close</button>
+        </div>
+        <form id="accounts-unlock-form" class="form-stack">
+          <div class="notice-card" id="acc-unlock-note" style="line-height: 1.45; font-size: 0.88rem;">
+            Financial records are protected. Authenticate with Mobile Fingerprint / Face ID or enter the verification password.
+          </div>
+          <button type="button" id="btn-biometric-acc-unlock" class="btn" style="width: 100%; background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color: #fff; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px; border-radius: 12px; font-weight: 800; cursor: pointer;">
+            <span>&#128274;</span> <span>Unlock with Fingerprint / Face ID</span>
+          </button>
+          <div style="text-align: center; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">Or enter verification password</div>
+          <div class="field">
+            <label for="accounts-security-key-input" style="font-weight: 780;" id="acc-unlock-key-label">Verification Password</label>
+            <div class="password-wrap">
+              <input id="accounts-security-key-input" type="password" placeholder="Enter verification password" autocomplete="off" style="font-size: 1.05rem;">
+              <button class="toggle-password" type="button" data-toggle-password="accounts-security-key-input">Show</button>
+            </div>
+          </div>
+          <div id="accounts-unlock-error" class="form-message" style="font-size: 0.88rem; font-weight: 700;"></div>
+          <div class="action-bar" style="justify-content: flex-end; gap: 8px; margin-top: 14px;">
+            <button class="btn-ghost small" type="button" data-close-modal="accounts-unlock-modal" id="btn-cancel-acc-unlock">Cancel</button>
+            <button class="btn-accent" type="submit" id="btn-submit-acc-unlock">Unlock Accounts</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- INVOICE DETAIL & PRINT MODAL -->
+    <div class="modal-backdrop" id="acc-invoice-modal">
+      <div class="modal" style="max-width: 900px;">
+        <div class="modal-header">
+          <h2 id="acc-invoice-modal-title">Invoice Details</h2>
+          <div class="inline-actions">
+            <button class="btn-accent small" type="button" id="btn-acc-print-modal">Print / Download</button>
+            <button class="btn-ghost small" type="button" data-close-modal="acc-invoice-modal">Close</button>
+          </div>
+        </div>
+        <div id="acc-invoice-modal-body" style="padding: 12px 0;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/accounts.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

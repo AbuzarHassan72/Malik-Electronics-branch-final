@@ -1,0 +1,23 @@
+.single-line-actions {
+  align-items: end;
+}
+
+#inventory-categories-card,
+#inventory-browser-results .company-model-section {
+  scroll-margin-top: 20px;
+}
+
+#category-form .field input,
+#category-form .field select,
+#category-form .field textarea {
+  min-height: 48px;
+}
+
+#category-image-preview {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+#selected-category-summary { line-height: 1.6; }
+#inventory-categories .inline-actions { margin-top: 8px; }

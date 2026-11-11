@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Purchases</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/purchases.css?v=20260407-v21-ui-safe">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Professional stock, billing and account management for the shop owner.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+                <a class="nav-link" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link active" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+
+      </nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Purchases</h1>
+          <p class="page-subtitle">Record supplier purchases and review purchase history with date, category and supplier filters.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section class="purchase-page-grid">
+        <!-- ADD PURCHASE INVOICE CARD (MULTI-ITEM BUILDER) -->
+        <section class="card purchase-entry-card">
+          <div class="section-title-row">
+            <div>
+              <h2 class="section-title">Add Purchase Invoice</h2>
+              <div class="muted">Record incoming supplier invoice with one or multiple stock items.</div>
+            </div>
+          </div>
+          <form id="purchase-entry-form" class="form-stack">
+            <!-- Invoice Meta Header -->
+            <div class="purchase-invoice-meta-grid">
+              <div class="field">
+                <label for="purchase-entry-supplier">Supplier / Vendor</label>
+                <input id="purchase-entry-supplier" type="text" placeholder="e.g. Haier Official Distributor">
+              </div>
+              <div class="field">
+                <label for="purchase-entry-phone">Supplier Phone</label>
+                <input id="purchase-entry-phone" type="text" placeholder="03XX-XXXXXXX">
+              </div>
+              <div class="field">
+                <label for="purchase-entry-date">Purchase Date</label>
+                <input id="purchase-entry-date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="purchase-entry-reference">Invoice / Reference #</label>
+                <input id="purchase-entry-reference" type="text" placeholder="Auto-generated if left blank">
+              </div>
+            </div>
+
+            <!-- Items Repeater Container -->
+            <div class="purchase-items-section">
+              <div class="items-section-header">
+                <h3 class="items-heading">Invoice Items</h3>
+                <button id="btn-add-purchase-item" class="btn-add-item" type="button">+ Add New Item</button>
+              </div>
+              <div id="purchase-items-container" class="purchase-items-container">
+                <!-- Repeated Item rows injected here -->
+              </div>
+            </div>
+
+            <div class="field full-width">
+              <label for="purchase-entry-notes">Invoice Notes</label>
+              <textarea id="purchase-entry-notes" placeholder="Optional notes regarding delivery, cargo, warranty, or credit terms..."></textarea>
+            </div>
+
+            <!-- Invoice Summary & Submit -->
+            <div class="purchase-invoice-footer">
+              <div class="invoice-summary-pills">
+                <span class="summary-pill">Total Items: <strong id="purchase-summary-items-count">0</strong></span>
+                <span class="summary-pill">Total Units: <strong id="purchase-summary-units-count">0</strong></span>
+                <span class="summary-pill">Grand Total: <strong id="purchase-summary-total-amount">Rs 0.00</strong></span>
+              </div>
+              <button class="btn-purchase-submit" type="submit">Save Complete Purchase Invoice</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- FILTERS, DATE PRESETS & SEARCH BAR -->
+        <section class="card purchase-filter-card">
+          <div class="section-title-row">
+            <div>
+              <h2 class="section-title">Filter Purchases</h2>
+              <div class="muted">Live multi-condition search &amp; date-filtered history.</div>
+            </div>
+            <!-- DATE PRESET BUTTONS -->
+            <div class="date-filter-nav">
+              <span class="date-filter-label">Date:</span>
+              <div class="date-presets-wrap">
+                <button type="button" class="date-preset-btn active" data-date-range="today">Today</button>
+                <button type="button" class="date-preset-btn" data-date-range="last_week">Last Week</button>
+                <button type="button" class="date-preset-btn" data-date-range="current_month">Current Month</button>
+                <button type="button" class="date-preset-btn" data-date-range="all">All</button>
+              </div>
+            </div>
+          </div>
+          <form id="purchase-filter-form" class="purchase-filters-row">
+            <div class="field compact-field grow-2">
+              <label for="purchase-search-input">Search</label>
+              <input id="purchase-search-input" type="text" placeholder="Search model, series, invoice #, supplier...">
+            </div>
+            <div class="field compact-field">
+              <label for="purchase-company-filter">Company</label>
+              <select id="purchase-company-filter"></select>
+            </div>
+            <div class="field compact-field">
+              <label for="purchase-category-filter">Category</label>
+              <select id="purchase-category-filter"></select>
+            </div>
+            <div class="field compact-field">
+              <label for="purchase-status-filter">Stock Status</label>
+              <select id="purchase-status-filter">
+                <option value="all">All Records</option>
+                <option value="in_stock">In Stock</option>
+                <option value="out_of_stock">Out of Stock</option>
+              </select>
+            </div>
+            <div class="field compact-field">
+              <label for="purchase-start-date">From</label>
+              <input id="purchase-start-date" type="date">
+            </div>
+            <div class="field compact-field">
+              <label for="purchase-end-date">To</label>
+              <input id="purchase-end-date" type="date">
+            </div>
+          </form>
+          <div id="purchase-summary-strip" class="browser-summary-strip"></div>
+        </section>
+      </section>
+
+      <!-- PURCHASE HISTORY TABLE -->
+      <section class="card purchase-history-card">
+        <div class="section-title-row">
+          <h2 class="section-title">Purchase History / Invoices</h2>
+        </div>
+        <div class="purchase-table-wrap">
+          <table class="purchase-table">
+            <thead>
+              <tr>
+                <th>Invoice #</th>
+                <th>Date</th>
+                <th>Supplier</th>
+                <th>Model / Variant</th>
+                <th>Quantity</th>
+                <th>Unit Cost</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="purchase-history-rows"></tbody>
+          </table>
+        </div>
+        <div id="purchase-empty-state" class="empty-state hidden">No purchase transactions found matching the current filters.</div>
+      </section>
+
+      <!-- VIEW INVOICE MODAL -->
+      <div id="purchase-view-modal" class="modal-backdrop">
+        <div class="modal invoice-modal">
+          <div class="modal-header print-hidden">
+            <h3 class="section-title">Purchase Invoice</h3>
+            <div class="modal-action-tools">
+              <button id="btn-print-purchase-invoice" class="btn-ghost small" type="button">Print Invoice</button>
+              <button class="btn-ghost small" type="button" data-close-modal>Close</button>
+            </div>
+          </div>
+          <div id="purchase-invoice-paper" class="invoice-paper">
+            <!-- Dynamically populated invoice layout -->
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT INVOICE MODAL -->
+      <div id="purchase-edit-modal" class="modal-backdrop">
+        <div class="modal edit-purchase-modal">
+          <div class="modal-header">
+            <h3 class="section-title">Edit Purchase Transaction</h3>
+            <button class="btn-ghost small" type="button" data-close-modal>Close</button>
+          </div>
+          <form id="purchase-edit-form" class="form-stack">
+            <input type="hidden" id="edit-purchase-id">
+            <div class="notice-card" id="edit-purchase-product-info"></div>
+            <div class="filter-grid">
+              <div class="field">
+                <label for="edit-purchase-qty">Quantity</label>
+                <input id="edit-purchase-qty" type="number" min="1" required>
+              </div>
+              <div class="field">
+                <label for="edit-purchase-cost">Unit Cost</label>
+                <input id="edit-purchase-cost" type="number" min="0" step="0.01" required>
+              </div>
+              <div class="field">
+                <label for="edit-purchase-date">Purchase Date</label>
+                <input id="edit-purchase-date" type="date" required>
+              </div>
+              <div class="field">
+                <label for="edit-purchase-color">Color</label>
+                <input id="edit-purchase-color" type="text">
+              </div>
+              <div class="field">
+                <label for="edit-purchase-supplier">Supplier</label>
+                <input id="edit-purchase-supplier" type="text">
+              </div>
+              <div class="field">
+                <label for="edit-purchase-phone">Supplier Phone</label>
+                <input id="edit-purchase-phone" type="text">
+              </div>
+              <div class="field">
+                <label for="edit-purchase-reference">Reference / Invoice #</label>
+                <input id="edit-purchase-reference" type="text">
+              </div>
+            </div>
+            <div class="field">
+              <label for="edit-purchase-notes">Notes</label>
+              <textarea id="edit-purchase-notes"></textarea>
+            </div>
+            <div class="modal-footer-row">
+              <button class="btn-accent" type="submit">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- DELETE SECURITY CODE MODAL (WITH MOBILE BIOMETRIC SUPPORT) -->
+      <div id="purchase-delete-modal" class="modal-backdrop no-print">
+        <div class="modal small" style="max-width: 440px;">
+          <div class="modal-header">
+            <h3 class="section-title" style="color: var(--red);">Authorize Purchase Reversal</h3>
+            <button class="btn-ghost small" type="button" data-close-modal="purchase-delete-modal">Cancel</button>
+          </div>
+          <form id="purchase-delete-form" class="form-stack">
+            <input type="hidden" id="delete-purchase-id">
+            <div class="notice-card danger-note">
+              <strong>Critical Operation:</strong> Reversing this purchase will permanently deduct the purchased units from current physical stock and remove the expense from the accounting ledger.
+            </div>
+            <button type="button" id="btn-biometric-reverse-purchase" class="btn" style="width: 100%; background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%); color: #fff; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px; border-radius: 12px; font-weight: 800; cursor: pointer;">
+              <span>&#128274;</span> <span>Authorize with Fingerprint / Face ID</span>
+            </button>
+            <div style="text-align: center; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">Or enter verification password</div>
+            <div class="field">
+              <label for="purchase-delete-security-key">Verification Password</label>
+              <input id="purchase-delete-security-key" type="password" placeholder="Enter verification password" autocomplete="off">
+            </div>
+            <div id="purchase-delete-error" class="form-message" style="color: var(--red); font-weight: 700; font-size: 0.85rem;"></div>
+            <div class="modal-footer-row" style="display: flex; justify-content: flex-end; gap: 8px;">
+              <button class="btn-ghost small" type="button" data-close-modal="purchase-delete-modal">Cancel</button>
+              <button class="btn-danger" type="submit">Confirm Reverse &amp; Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/purchases.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

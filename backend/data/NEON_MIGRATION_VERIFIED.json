@@ -1,0 +1,33 @@
+{
+  "migrated_at": "2026-11-11T17:59:12.367168",
+  "status": "VERIFIED_100_PERCENT",
+  "backup_location": "C:\\Users\\DELL\\Desktop\\Malik-Electronic_update_2 branch _v30_final\\Malik_Electronic_SQLite_Backups\\malik_electronic_pro_v4_PRE_NEON_BACKUP_20261111_225847.db",
+  "metrics": {
+    "counts": {
+      "branches": 2,
+      "users": 1,
+      "app_settings": 5,
+      "categories": 51,
+      "locations": 6,
+      "companies": 36,
+      "catalog_models": 1185,
+      "products": 512,
+      "invoices": 161,
+      "purchase_entries": 504,
+      "sale_entries": 241,
+      "invoice_items": 189,
+      "discount_rules": 0,
+      "account_transactions": 645,
+      "activity_logs": 2144,
+      "branch_transfers": 35
+    },
+    "financials": {
+      "total_purchased_units": 1012,
+      "total_purchase_spend": 24027900.0,
+      "total_invoice_amount": 6578200.0,
+      "total_sold_units": 241,
+      "total_gross_profit": 1487100.0,
+      "total_account_ledger_amount": 29615600.0
+    }
+  }
+}

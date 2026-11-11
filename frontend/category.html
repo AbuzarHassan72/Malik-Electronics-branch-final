@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Category Management</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/category.css?v=20260407-v21-ui-safe">
+  <style>
+    /* Category Card Polish & Energetic Typography */
+    .model-browser-card {
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 18px !important;
+      background: #ffffff !important;
+      padding: 20px !important;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04) !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .model-browser-card:hover {
+      transform: translateY(-3px) !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+    }
+    /* Executive Metric Pill Cards (COLORS / LOCATIONS / AMOUNT) */
+    .executive-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .exec-metric-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .exec-metric-card:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+    }
+    .exec-metric-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .exec-metric-val {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+    /* Self-explanatory Color-Location Breakdown inside Category Card */
+    .exec-breakdown-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-top: 14px;
+    }
+    .exec-breakdown-heading {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: #334155;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .exec-color-row {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin-bottom: 7px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .exec-color-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .exec-color-title {
+      font-weight: 800;
+      font-size: 0.9rem;
+      color: #0f172a;
+    }
+    .exec-color-subtotal {
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 99px;
+      border: 1px solid #bbf7d0;
+    }
+    .exec-loc-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .exec-loc-badge {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 3px 9px;
+      font-size: 0.8rem;
+      color: #1e293b;
+    }
+    .exec-loc-badge strong {
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+    /* Energetic Category Card Actions */
+    .category-card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .btn-cat-manage {
+      flex: 1;
+      background: #0f172a;
+      color: #ffffff !important;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .btn-cat-manage:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+    }
+    .btn-cat-sales {
+      flex: 1;
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      color: #ffffff !important;
+      border: none;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+    .btn-cat-sales:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Category stock management with variant control, location transfers, and branch dispatching.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link active" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+        <a class="nav-link" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="btn-dark" type="button" onclick="location.href='/inventory'">Back to categories</button>
+        <button class="btn-danger" data-logout>Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title" id="category-page-title">Category</h1>
+          <p class="page-subtitle" id="category-page-subtitle">Product models organized by company, stock status, and color-wise location breakdown.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section class="hero-banner">
+        <div class="section-banner no-border">
+          <div style="display: flex; align-items: center; gap: 16px;">
+            <div id="category-hero-media"></div>
+            <div>
+              <div class="muted">Active category</div>
+              <h2 class="section-title" id="category-hero-title">Loading...</h2>
+            </div>
+          </div>
+          <div class="inline-actions">
+            <button class="btn-accent" id="add-master-model-btn" type="button">Create Master Model</button>
+            <button class="btn" id="manage-stock-btn" type="button">Manage Stock</button>
+            <a class="btn-ghost" id="category-sales-link" href="/sales">Sales &amp; Billing</a>
+          </div>
+        </div>
+        <div id="category-summary" class="auto-grid"></div>
+      </section>
+
+      <section class="card">
+        <form id="category-filter-form" class="single-line-filters">
+          <div class="field compact-field">
+            <label for="category-company-filter">Company</label>
+            <select id="category-company-filter"></select>
+          </div>
+          <div class="field compact-field">
+            <label for="category-series-filter">Series</label>
+            <select id="category-series-filter"></select>
+          </div>
+          <div class="field compact-field">
+            <label for="category-stock-filter">Stock Filter</label>
+            <select id="category-stock-filter">
+              <option value="all">All Models</option>
+              <option value="in_stock">In Stock Only</option>
+              <option value="out_of_stock">Out of Stock</option>
+            </select>
+          </div>
+          <div class="field compact-field grow-2">
+            <label for="category-search-input">Search Models</label>
+            <input id="category-search-input" type="text" placeholder="Search model, color or location">
+          </div>
+          <div class="field compact-field actions-field">
+            <label>&nbsp;</label>
+            <button class="btn" type="submit">Apply</button>
+          </div>
+          <div class="field compact-field actions-field">
+            <label>&nbsp;</label>
+            <button class="btn-ghost" type="button" id="toggle-category-list">Hide list</button>
+          </div>
+        </form>
+        <div id="category-breakdown" class="browser-summary-strip"></div>
+        <div id="category-company-sections" class="model-browser-sections"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- CREATE MASTER MODEL MODAL -->
+  <div class="modal-backdrop" id="master-model-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2>Create Master Model</h2><button class="btn-ghost small" type="button" data-close-modal="master-model-modal">Close</button></div>
+      <form id="master-model-form" class="form-stack">
+        <div class="grid-2">
+          <div class="field"><label for="master-company">Company</label><select id="master-company"></select></div>
+          <div class="field"><label for="master-series">Series</label><input id="master-series" type="text" placeholder="e.g. Inverter Series, Pro"></div>
+        </div>
+        <div class="field"><label for="master-model">Master Model Name</label><input id="master-model" type="text" required placeholder="e.g. HSU-18H"></div>
+        <div class="field"><label for="master-price">Suggested Retail Price</label><input id="master-price" type="number" min="0" step="0.01" value="0"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save Master Model</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MANAGE STOCK MODAL -->
+  <div class="modal-backdrop" id="stock-modal">
+    <div class="modal" style="max-width: 900px;">
+      <div class="modal-header">
+        <h2 id="stock-modal-title">Manage Stock</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="stock-modal">Close</button>
+      </div>
+      <div id="stock-modal-summary" class="notice-card" style="margin-bottom: 14px;"></div>
+      
+      <div class="section-title-row" style="margin-bottom: 10px;">
+        <h3 style="font-size: 1.05rem; font-weight: 800;">Existing Stock by Color &amp; Location</h3>
+        <button type="button" class="btn-ghost small" id="btn-add-variant-toggle">+ Add New Color/Location</button>
+      </div>
+      <div id="stock-existing-variants" class="stacked-mini-cards" style="margin: 0 0 18px 0;"></div>
+      
+      <form id="stock-form" class="form-stack" style="border-top: 1px solid var(--line); padding-top: 16px;">
+        <input id="stock-product-id" type="hidden">
+        <div class="field wide-field"><label for="stock-model-display">Model</label><input id="stock-model-display" type="text" disabled></div>
+        <div class="filter-grid roomy-grid">
+          <div class="field"><label for="stock-company">Company</label><input id="stock-company" type="text" disabled></div>
+          <div class="field"><label for="stock-series">Series</label><input id="stock-series" type="text"></div>
+          <div class="field"><label for="stock-model-name">Model name</label><input id="stock-model-name" type="text" required></div>
+          <div class="field"><label for="stock-size">Size</label><input id="stock-size" type="text" placeholder="1 Ton, 13 KG, 55 inch"></div>
+          <div class="field"><label for="stock-location">Location</label><select id="stock-location"></select></div>
+          <div class="field"><label for="stock-color">Color</label><input id="stock-color" type="text" placeholder="e.g. White, Red, Grey"></div>
+          <div class="field"><label for="stock-min">Minimum Alert Stock</label><input id="stock-min" type="number" min="0" value="0"></div>
+          <div class="field"><label for="stock-purchase">Unit Purchase Price (Rs)</label><input id="stock-purchase" type="number" min="0" step="0.01" value="0"></div>
+          <div class="field"><label for="stock-sale">Unit Sale Price (Rs)</label><input id="stock-sale" type="number" min="0" step="0.01" value="0"></div>
+          <div class="field" style="background: var(--surface-2); border: 1px solid var(--line-strong); padding: 8px 12px; border-radius: 10px;">
+            <label for="stock-opening-quantity" style="color: var(--blue-dark); font-weight: 800;">Add New Purchased Quantity</label>
+            <input id="stock-opening-quantity" type="number" min="0" value="0" placeholder="0" style="font-weight: 800; font-size: 1.05rem;">
+            <small class="muted" style="font-size: 0.76rem;">Enter number to increment stock for this color &amp; location</small>
+          </div>
+        </div>
+        <div class="grid-2 roomy-grid">
+          <div class="field"><label for="stock-bulk-colors">Add Multiple Colors (Initial Creation)</label><input id="stock-bulk-colors" type="text" placeholder="Black, White, Emerald Green"></div>
+          <div class="field"><label for="stock-notes">Notes</label><textarea id="stock-notes"></textarea></div>
+        </div>
+        <div class="action-bar" style="justify-content: flex-end; gap: 8px;">
+          <button class="btn-accent" type="submit" id="btn-save-stock-submit">Save &amp; Update Stock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MOVE STOCK LOCATION MODAL (Within Branch) -->
+  <div class="modal-backdrop" id="move-stock-modal">
+    <div class="modal small" style="max-width: 460px;">
+      <div class="modal-header">
+        <h2 style="font-size: 1.2rem; color: var(--blue-dark);">Move Stock Location</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="move-stock-modal">Close</button>
+      </div>
+      <form id="move-stock-form" class="form-stack">
+        <input id="move-source-product-id" type="hidden">
+        <div class="notice-card" id="move-stock-info" style="font-size:0.88rem; line-height:1.5;"></div>
+        <div class="field">
+          <label for="move-target-location">Destination Location (e.g. Display)</label>
+          <select id="move-target-location" required style="min-height: 44px;"></select>
+        </div>
+        <div class="field">
+          <label for="move-transfer-qty">Quantity of Units to Move</label>
+          <input id="move-transfer-qty" type="number" min="1" value="1" required style="min-height: 44px; font-weight: 800;">
+        </div>
+        <div id="move-stock-error" class="form-message" style="color: var(--red); font-weight:700;"></div>
+        <div class="action-bar" style="justify-content: flex-end; gap: 8px;">
+          <button class="btn-ghost small" type="button" data-close-modal="move-stock-modal">Cancel</button>
+          <button class="btn-accent" type="submit" id="btn-submit-move">Confirm Move</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- INTER-BRANCH TRANSFER MODAL (From Manage Stock) -->
+  <div class="modal-backdrop" id="category-branch-transfer-modal">
+    <div class="modal small" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 style="font-size: 1.2rem; color: var(--blue-dark);">Transfer Stock to Another Branch</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="category-branch-transfer-modal">Close</button>
+      </div>
+      <form id="category-branch-transfer-form" class="form-stack">
+        <input id="cat-transfer-product-id" type="hidden">
+        <div class="notice-card" id="cat-transfer-info" style="font-size:0.88rem; line-height:1.5;"></div>
+        <div class="field">
+          <label for="cat-transfer-target-branch">Destination Branch</label>
+          <select id="cat-transfer-target-branch" required style="min-height: 44px; font-weight: 700;"></select>
+        </div>
+        <div class="field">
+          <label for="cat-transfer-qty">Quantity to Transfer</label>
+          <input id="cat-transfer-qty" type="number" min="1" value="1" required style="min-height: 44px; font-weight: 800;">
+        </div>
+        <div class="field">
+          <label for="cat-transfer-notes">Transfer Note</label>
+          <input id="cat-transfer-notes" type="text" placeholder="e.g. Sent for customer display" style="min-height: 44px;">
+        </div>
+        <div id="cat-transfer-error" class="form-message" style="color: var(--red); font-weight: 700;"></div>
+        <div class="action-bar" style="justify-content: flex-end; gap: 8px;">
+          <button class="btn-ghost small" type="button" data-close-modal="category-branch-transfer-modal">Cancel</button>
+          <button class="btn-accent" type="submit" id="btn-submit-cat-transfer">Confirm Branch Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/category.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

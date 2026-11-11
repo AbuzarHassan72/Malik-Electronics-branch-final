@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Stock Inventory</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/stocks.css?v=20260407-v21-ui-safe">
+  <style>
+    .stock-table-wrap {
+      overflow-x: hidden !important;
+      width: 100% !important;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03);
+    }
+    .stock-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      table-layout: auto !important;
+    }
+    .stock-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 14px 16px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .stock-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    .stock-table tr:hover td {
+      background: #fafcff;
+    }
+    .btn-stock-manage {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 750;
+      font-size: 0.82rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .btn-stock-manage:hover {
+      background: #0f172a;
+      color: #ffffff;
+      border-color: #0f172a;
+      transform: translateY(-1px);
+    }
+    .btn-stock-sale {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      color: #ffffff !important;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-weight: 750;
+      font-size: 0.82rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .btn-stock-sale:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #3730a3 100%);
+      transform: translateY(-1px);
+    }
+    .total-stock-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 6px 12px;
+      min-width: 65px;
+    }
+    .total-stock-num {
+      font-size: 1.35rem;
+      font-weight: 900;
+      color: #0f172a;
+      line-height: 1;
+    }
+    .total-stock-sub {
+      font-size: 0.68rem;
+      font-weight: 750;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .stock-matrix-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .stock-matrix-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .stock-color-head {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stock-color-title {
+      font-weight: 800;
+      font-size: 0.86rem;
+      color: #1e293b;
+    }
+    .stock-color-badge {
+      background: #dcfce7;
+      color: #166534;
+      font-size: 0.74rem;
+      font-weight: 750;
+      padding: 2px 7px;
+      border-radius: 99px;
+      border: 1px solid #bbf7d0;
+    }
+    .stock-loc-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .stock-loc-chip {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.78rem;
+      color: #334155;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stock-loc-chip strong {
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Branch stock control with color and location tracking, and inter-branch transfers.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+        <a class="nav-link active" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Stock Inventory</h1>
+          <p class="page-subtitle">Detailed model stock with color &amp; location distribution, and dedicated inter-branch movement records.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section class="card" style="padding: 14px 18px; margin-bottom: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div class="inline-actions" id="stocks-view-tab-strip">
+            <button type="button" class="btn-ghost small active" id="tab-btn-stock-inventory" style="font-weight: 800; border-color: var(--blue-dark);">Branch Stock Inventory</button>
+            <button type="button" class="btn-ghost small" id="tab-btn-branch-transfers">Branch Transfer Records</button>
+          </div>
+          <div>
+            <button type="button" class="btn-accent small" id="btn-open-branch-transfer">Transfer Stock Between Branches</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="stocks-companies-section">
+        <div class="section-title-row">
+          <div>
+            <h2 class="section-title">Companies</h2>
+            <div class="muted">All available companies for this branch.</div>
+          </div>
+          <div class="company-filter-nav">
+            <span class="company-filter-label">Filter:</span>
+            <button id="stocks-all-companies-btn" class="all-companies-btn" type="button" data-stocks-company="">
+              All Companies
+            </button>
+          </div>
+        </div>
+        <div id="stocks-company-grid" class="company-grid"></div>
+      </section>
+
+      <section class="card" id="stocks-filter-card">
+        <div class="section-title-row">
+          <h2 class="section-title">Stock filters</h2>
+        </div>
+        <form id="stocks-filter-form" class="single-line-filters">
+          <div class="field compact-field">
+            <label for="stocks-company-filter">Company</label>
+            <select id="stocks-company-filter"></select>
+          </div>
+          <div class="field compact-field">
+            <label for="stocks-category-filter">Category</label>
+            <select id="stocks-category-filter"></select>
+          </div>
+          <div class="field compact-field">
+            <label for="stocks-status-filter">Stock Status</label>
+            <select id="stocks-status-filter">
+              <option value="in_stock" selected>In stock</option>
+              <option value="all">All models</option>
+              <option value="out_of_stock">Out of stock</option>
+            </select>
+          </div>
+          <div class="field compact-field grow-2">
+            <label for="stocks-search-input">Search</label>
+            <input id="stocks-search-input" type="text" placeholder="Search model, series, color or location">
+          </div>
+        </form>
+        <div id="stocks-summary" class="browser-summary-strip"></div>
+      </section>
+
+      <section id="stocks-results" class="stocks-section-list"></section>
+
+      <section id="branch-transfers-section" class="card hidden" style="margin-top: 18px;">
+        <div class="section-title-row">
+          <div>
+            <h2 class="section-title">Inter-Branch Movement History</h2>
+            <div class="notice-inline">Stock movements between Talagang City and Multan Khurd are logged here and kept separate from customer sales and supplier purchases.</div>
+          </div>
+          <button type="button" class="btn-ghost small" id="btn-refresh-transfers">Refresh Transfers</button>
+        </div>
+        <div class="purchase-table-wrap" style="margin-top: 14px; overflow-x: auto;">
+          <table class="stock-table">
+            <thead>
+              <tr>
+                <th>Date &amp; Time</th>
+                <th>Reference #</th>
+                <th>Transfer Flow</th>
+                <th>Model / Variant</th>
+                <th>Color</th>
+                <th>Quantity</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="branch-transfers-table-body"></tbody>
+          </table>
+        </div>
+        <div id="branch-transfers-empty" class="empty-state hidden">No inter-branch transfers recorded yet.</div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="branch-transfer-modal">
+    <div class="modal small" style="max-width: 480px;">
+      <div class="modal-header">
+        <h2 style="font-size: 1.2rem; color: var(--blue-dark);">Transfer Stock to Another Branch</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="branch-transfer-modal">Close</button>
+      </div>
+      <form id="branch-transfer-form" class="form-stack">
+        <div class="notice-card" style="font-size: 0.88rem; line-height: 1.5;">
+          Select available stock from the current branch to transfer to the target branch. Units and records will update automatically across both branches.
+        </div>
+        <div class="field">
+          <label for="transfer-target-branch">Destination Branch</label>
+          <select id="transfer-target-branch" required style="min-height: 44px; font-weight:700;"></select>
+        </div>
+        <div class="field">
+          <label for="transfer-product-select">Select Product &amp; Location (In-Stock)</label>
+          <select id="transfer-product-select" required style="min-height: 44px;"></select>
+        </div>
+        <div class="field">
+          <label for="transfer-quantity">Quantity of Units to Transfer</label>
+          <input id="transfer-quantity" type="number" min="1" value="1" required style="min-height: 44px; font-weight:800;">
+        </div>
+        <div class="field">
+          <label for="transfer-notes">Transfer Note / Reason</label>
+          <input id="transfer-notes" type="text" placeholder="e.g. Dispatched for branch requirements" style="min-height: 44px;">
+        </div>
+        <div id="branch-transfer-error" class="form-message" style="color: var(--red); font-weight: 700;"></div>
+        <div class="action-bar" style="justify-content: flex-end; gap: 8px;">
+          <button class="btn-ghost small" type="button" data-close-modal="branch-transfer-modal">Cancel</button>
+          <button class="btn-accent" type="submit" id="btn-submit-branch-transfer">Confirm Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/stocks.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Dashboard</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/dashboard.css?v=20260407-v21-ui-safe">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Fast company dashboard with direct category access, secure price visibility, quick stock management, and cleaner browser-safe rendering.</p>
+      </div>
+      <nav class="nav-list"></nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Professional Dashboard</h1>
+          <p class="page-subtitle">Select a company, review totals, open the full category page by clicking a category card, or use quick stock management without leaving the dashboard.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section id="dashboard-stats" class="auto-grid"></section>
+
+      <section class="card">
+        <div class="section-title-row">
+          <h2 class="section-title">Companies</h2>
+          <div class="inline-actions">
+            <button class="btn-accent small" id="dashboard-new-company" type="button">Manage Companies</button>
+          </div>
+        </div>
+        <div id="company-grid" class="company-grid"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-title-row">
+          <div>
+            <h2 class="section-title">Categories by company</h2>
+            <div class="notice-inline">Click any category card to open the full category page. Use Manage stock for fast add, edit, and delete without leaving the dashboard.</div>
+          </div>
+        </div>
+        <div id="company-categories" class="compact-category-grid"></div>
+      </section>
+    </main>
+  </div>
+
+<div class="modal-backdrop" id="company-modal">
+    <div class="modal" style="max-width: 680px;">
+      <div class="modal-header">
+        <h2 id="company-modal-title">Manage Companies</h2>
+        <button class="btn-ghost" type="button" data-close-modal="company-modal">Close</button>
+      </div>
+
+      <form id="company-form" class="form-stack">
+        <input id="company-id" type="hidden">
+        <div class="grid-2">
+          <div class="field">
+            <label for="company-name">Company Name</label>
+            <input id="company-name" type="text" maxlength="120" required placeholder="e.g. Dawlance, Haier, DELL">
+          </div>
+          <div class="field">
+            <label for="company-image-upload">Logo Image (Optional)</label>
+            <input id="company-image-upload" type="file" accept=".png,.jpg,.jpeg,.jfif,.webp,.svg">
+            <input id="company-image-path" type="hidden">
+          </div>
+        </div>
+        <div id="company-image-preview" class="inline-select-note" style="margin-top:-6px;">No logo uploaded yet.</div>
+        <div id="company-form-message" class="form-message"></div>
+        <div class="action-bar">
+          <button class="btn-accent" type="submit" id="save-company-btn">Save Company</button>
+          <button class="btn-ghost" type="button" id="reset-company-btn" style="display:none;">Cancel Edit</button>
+        </div>
+      </form>
+
+      <div style="margin-top: 22px; border-top: 1px solid var(--line); padding-top: 16px;">
+        <h3 style="margin: 0 0 10px; font-size: 1.05rem; font-weight: 800;">Existing Companies in this Branch</h3>
+        <div id="dashboard-company-registry" class="company-registry-list"></div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-backdrop" id="dashboard-manage-modal">
+    <div class="modal manager-modal">
+      <div class="modal-header">
+        <div>
+          <h2 id="dashboard-manage-title">Manage stock</h2>
+          <div id="dashboard-manage-subtitle" class="notice-inline">Quick stock manager</div>
+        </div>
+        <button class="btn-ghost" type="button" data-close-modal="dashboard-manage-modal">Close</button>
+      </div>
+      <div id="dashboard-manage-summary" class="manager-summary"></div>
+      <form id="dashboard-manager-filter" class="manager-toolbar">
+        <div class="field grow-2"><label for="dashboard-manager-search">Search</label><input id="dashboard-manager-search" type="text" placeholder="Search model, series, color or location"></div>
+        <div class="field compact-field"><label for="dashboard-manager-stock">Stock</label><select id="dashboard-manager-stock"><option value="all">All models</option><option value="in_stock">In stock</option><option value="out_of_stock">Out of stock</option></select></div>
+        <div class="field actions-field"><label>&nbsp;</label><button class="btn" type="submit">Apply</button></div>
+      </form>
+      <div class="inline-actions" style="margin-bottom:14px"><button class="btn-accent" id="dashboard-add-master-model" type="button">Create master model</button><a class="btn-ghost" id="dashboard-open-full-page" href="/inventory">Open full page</a></div>
+      <div id="dashboard-manage-grid" class="manager-grid"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="master-model-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2>Create master model</h2><button class="btn-ghost" type="button" data-close-modal="master-model-modal">Close</button></div>
+      <form id="master-model-form" class="form-stack">
+        <div class="grid-2">
+          <div class="field"><label for="master-company">Company</label><select id="master-company"></select></div>
+          <div class="field"><label for="master-series">Series</label><input id="master-series" type="text" placeholder="Example: Solar Hybrid, Chrome Pro"></div>
+        </div>
+        <div class="field"><label for="master-model">Master model name</label><input id="master-model" type="text" required></div>
+        <div class="field"><label for="master-price">Suggested price</label><input id="master-price" type="number" min="0" step="0.01" value="0"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save master model</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="stock-modal">
+    <div class="modal">
+      <div class="modal-header"><h2 id="stock-modal-title">Manage stock</h2><button class="btn-ghost" type="button" data-close-modal="stock-modal">Close</button></div>
+      <div id="stock-modal-summary" class="notice-card"></div>
+      <div id="stock-existing-variants" class="stacked-mini-cards" style="margin: 18px 0;"></div>
+      <form id="stock-form" class="form-stack">
+        <input id="stock-product-id" type="hidden">
+        <div class="field wide-field"><label for="stock-model-display">Model</label><input id="stock-model-display" type="text" disabled></div>
+        <div class="filter-grid roomy-grid">
+          <div class="field"><label for="stock-company">Company</label><input id="stock-company" type="text" disabled></div>
+          <div class="field"><label for="stock-series">Series</label><input id="stock-series" type="text"></div>
+          <div class="field"><label for="stock-model-name">Model name</label><input id="stock-model-name" type="text" required></div>
+          <div class="field"><label for="stock-size">Size</label><input id="stock-size" type="text" placeholder="1 Ton, 13 KG, 55 inch"></div>
+          <div class="field"><label for="stock-location">Location</label><select id="stock-location"></select></div>
+          <div class="field"><label for="stock-color">Primary color</label><input id="stock-color" type="text" placeholder="Emerald Green"></div>
+          <div class="field"><label for="stock-min">Minimum stock</label><input id="stock-min" type="number" min="0" value="0"></div>
+          <div class="field"><label for="stock-purchase">Purchase price</label><input id="stock-purchase" type="number" min="0" step="0.01" value="0"></div>
+          <div class="field"><label for="stock-sale">Sale price</label><input id="stock-sale" type="number" min="0" step="0.01" value="0"></div>
+          <div class="field"><label for="stock-opening-quantity">Quantity to add now</label><input id="stock-opening-quantity" type="number" min="0" value="0"></div>
+        </div>
+        <div class="grid-2 roomy-grid">
+          <div class="field"><label for="stock-bulk-colors">Add multiple colors</label><input id="stock-bulk-colors" type="text" placeholder="Black, White, Emerald Green, Cloud White"></div>
+          <div class="field"><label for="stock-notes">Notes</label><textarea id="stock-notes"></textarea></div>
+        </div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save stock</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/dashboard.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

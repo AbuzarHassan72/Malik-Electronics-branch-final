@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Category &amp; Location Management</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/inventory.css?v=20260407-v21-ui-safe">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Modern category and location control with smart search, safer cache handling, and direct access to full model management.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link active" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+                <a class="nav-link" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+
+      </nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">Category &amp; Location Management</h1>
+          <p class="page-subtitle">Create and organize categories, manage locations, and open the full category manager for exact model and stock control.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section class="card">
+        <div class="toolbar-grid">
+          <button class="btn-accent" id="inventory-new-category" type="button">New category</button>
+          <button class="btn-ghost" id="inventory-edit-category" type="button">Edit selected</button>
+          <button class="btn-danger" id="inventory-delete-category" type="button">Delete selected</button>
+          <div class="field">
+            <label for="inventory-search">Category search</label>
+            <input id="inventory-search" type="text" placeholder="Search category, icon or description" autocomplete="off">
+            <div id="inventory-search-suggestions" class="search-suggestions"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="management-grid">
+        <section class="card">
+          <div class="section-title-row">
+            <h2 class="section-title">Categories</h2>
+            <div class="notice-inline">Most relevant matches stay on top while you type.</div>
+          </div>
+          <div id="inventory-categories" class="compact-category-grid"></div>
+        </section>
+
+        <section class="card">
+          <div class="section-title-row">
+            <h2 class="section-title">Location management</h2>
+            <button class="btn-accent small" id="inventory-new-location" type="button">New location</button>
+          </div>
+          <div id="location-list" class="management-list"></div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="category-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2 id="category-modal-title">New category</h2><button class="btn-ghost" type="button" data-close-modal="category-modal">Close</button></div>
+      <form id="category-form" class="form-stack">
+        <input id="category-id" type="hidden">
+        <div class="field"><label for="category-name">Category name</label><input id="category-name" type="text" required></div>
+        <div class="grid-2">
+          <div class="field">
+            <label for="category-icon">Icon / emoji</label>
+            <input id="category-icon" type="text" maxlength="8">
+            <div id="category-icon-picker" class="category-icon-picker"></div>
+          </div>
+          <div class="field">
+            <label for="category-description">Description</label>
+            <input id="category-description" type="text">
+          </div>
+        </div>
+        <input id="category-image-path" type="hidden">
+        <div class="field">
+          <label for="category-image-upload">Category image</label>
+          <input id="category-image-upload" type="file" accept=".png,.jpg,.jpeg,.jfif,.webp,.gif,.svg">
+          <div id="category-image-preview" class="inline-select-note">No uploaded image yet.</div>
+        </div>
+
+        <!-- NEW: Integrated Company Association -->
+        <div class="field company-association-panel">
+          <label style="font-size: 1.05rem; margin-bottom: 6px; display: block;">Link to Company (Optional)</label>
+          <div class="company-tabs">
+            <button type="button" class="tab-button active" id="tab-select-company">Select Existing</button>
+            <button type="button" class="tab-button" id="tab-create-company">Create New</button>
+          </div>
+          
+          <!-- Select Existing -->
+          <div id="view-select-company" class="field">
+            <label for="category-company-select">Choose Company</label>
+            <select id="category-company-select"></select>
+          </div>
+
+          <!-- Create New -->
+          <div id="view-create-company" class="form-stack hidden" style="margin-top: 10px;">
+            <div class="field">
+              <label for="new-company-name">New Company Name</label>
+              <input id="new-company-name" type="text" placeholder="e.g. Samsung">
+            </div>
+            <input id="new-company-image-path" type="hidden">
+            <div class="field">
+              <label for="new-company-image-upload">Company Logo</label>
+              <input id="new-company-image-upload" type="file" accept=".png,.jpg,.jpeg,.jfif,.webp,.gif,.svg">
+              <div id="new-company-image-preview" class="inline-select-note">No logo uploaded yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="category-form-message" class="form-message"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save category</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="location-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2 id="location-modal-title">New location</h2><button class="btn-ghost" type="button" data-close-modal="location-modal">Close</button></div>
+      <form id="location-form" class="form-stack">
+        <input id="location-id" type="hidden">
+        <div class="field"><label for="location-name">Location name</label><input id="location-name" type="text" required></div>
+        <div class="field"><label for="location-description">Description</label><input id="location-description" type="text"></div>
+        <div id="location-form-message" class="form-message"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save location</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/inventory.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

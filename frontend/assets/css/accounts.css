@@ -1,0 +1,33 @@
+.access-panel {
+  align-self: start;
+}
+
+.access-panel .form-stack {
+  gap: 14px;
+}
+
+.access-panel .field input {
+  min-height: 48px;
+}
+
+#account-stats .stat-card {
+  min-height: 156px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+#account-stats .stat-card:hover {
+  transform: translateY(-2px);
+}
+
+#recent-invoices .table-row,
+#recent-activity .record-card {
+  border-radius: 18px;
+}
+
+#recent-invoices .price-safe-box,
+#account-stats .price-safe-box {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}

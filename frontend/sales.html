@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Sales &amp; POS Billing</title>
+  <link rel="icon" href="/static/favicon.svg?v=20261111-v32" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20261111-v32">
+  <link rel="stylesheet" href="/static/css/sales.css?v=20261111-v32">
+  <style>
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .stagger-1 { animation: slideInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .stagger-2 { animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    .line-item-row {
+      display: flex;
+      gap: 14px;
+      padding: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      align-items: center;
+      animation: fadeIn 0.25s ease forwards;
+      transition: all 0.2s ease;
+    }
+    .line-item-row:hover {
+      border-color: rgba(29, 78, 216, 0.28);
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+    }
+    .line-item-warning {
+      border-color: rgba(220, 38, 38, 0.45) !important;
+      background: #fffafa !important;
+    }
+    .invoice-history-card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--surface-2);
+      transition: all 0.2s ease;
+    }
+    .invoice-history-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+    .input-stepper {
+      display: flex;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .input-stepper button {
+      background: transparent;
+      border: none;
+      padding: 0 12px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      cursor: pointer;
+    }
+    .input-stepper input {
+      border: none;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.05rem;
+      padding: 8px 0;
+      width: 100%;
+    }
+
+    /* Action Buttons inside Invoice Modal */
+    .invoice-action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .btn-print-invoice {
+      background: #0f172a;
+      color: #ffffff !important;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.18);
+      transition: all 0.2s ease;
+    }
+    .btn-print-invoice:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+    .btn-whatsapp {
+      background: #16a34a;
+      color: #ffffff !important;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.86rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.22);
+      transition: all 0.2s ease;
+    }
+    .btn-whatsapp:hover {
+      background: #15803d;
+      transform: translateY(-1px);
+    }
+
+    /* Modern Professional Invoice Sheet */
+    .print-invoice-sheet {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 24px 28px;
+      color: #0f172a;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    }
+    .inv-top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .inv-brand-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .inv-logo-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #facc15;
+      font-weight: 900;
+      font-size: 1.35rem;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border: 2px solid #e2e8f0;
+    }
+    .inv-shop-name {
+      font-size: 1.45rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #0f172a;
+      margin: 0;
+      line-height: 1.15;
+    }
+    .inv-shop-sub {
+      font-size: 0.82rem;
+      color: #475569;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .inv-meta-right {
+      text-align: right;
+    }
+    .inv-doc-label {
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #1d4ed8;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 3px 10px;
+      border-radius: 99px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+    .inv-number-title {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #0f172a;
+      margin: 0;
+    }
+    .inv-date-text {
+      font-size: 0.8rem;
+      color: #475569;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+    .inv-info-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .inv-info-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .inv-info-label {
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .inv-party-name {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .inv-party-detail {
+      font-size: 0.82rem;
+      color: #334155;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .inv-items-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 0.86rem;
+    }
+    .inv-items-table thead tr {
+      background: #0f172a;
+      color: #ffffff;
+    }
+    .inv-items-table th {
+      padding: 9px 10px;
+      font-size: 0.73rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: left;
+    }
+    .inv-items-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+      color: #0f172a;
+    }
+    .inv-items-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .inv-category-pill {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 800;
+      font-size: 0.74rem;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      border: 1px solid #bfdbfe;
+    }
+    .inv-product-title {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: #0f172a;
+    }
+    .inv-product-specs {
+      font-size: 0.76rem;
+      color: #475569;
+      margin-top: 2px;
+    }
+    .inv-summary-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      border-top: 2px solid #e2e8f0;
+      padding-top: 12px;
+    }
+    .inv-terms-box {
+      font-size: 0.76rem;
+      color: #475569;
+      max-width: 55%;
+      line-height: 1.45;
+    }
+    .inv-totals-box {
+      min-width: 240px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+    .inv-total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #334155;
+      padding: 3px 0;
+    }
+    .inv-grand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.08rem;
+      font-weight: 900;
+      color: #0f172a;
+      border-top: 2px solid #0f172a;
+      margin-top: 6px;
+      padding-top: 6px;
+    }
+    .inv-signature-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 22px;
+      padding-top: 10px;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+
+    @media (max-width: 1100px) {
+      .sales-grid { grid-template-columns: 1fr; }
+      .line-item-row { flex-wrap: wrap; }
+    }
+    @media (max-width: 640px) {
+      .print-invoice-sheet { padding: 14px; }
+      .inv-top-header { flex-direction: column; }
+      .inv-meta-right { text-align: left; }
+      .inv-info-grid { grid-template-columns: 1fr; }
+      .inv-summary-section { flex-direction: column; align-items: stretch; }
+      .inv-terms-box { max-width: 100%; }
+      .inv-items-table th, .inv-items-table td { padding: 7px 6px; font-size: 0.78rem; }
+    }
+
+    /* STRICT SINGLE-PAGE A4 PRINT ISOLATION (Fixes 3-page print issue) */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 8mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      /* Completely hide the entire app shell, closed modals, password modals, and discount modals */
+      body > *:not(#invoice-detail-modal),
+      .app-shell,
+      .sidebar,
+      .main-area,
+      .page-header,
+      .modal-backdrop:not(#invoice-detail-modal),
+      #discount-rule-modal,
+      #security-reverse-modal,
+      #price-unlock-modal,
+      .modal-header,
+      .no-print,
+      .invoice-action-bar,
+      .toast-stack {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        width: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        left: -9999px !important;
+      }
+      /* Render ONLY the open invoice modal on 1 page */
+      #invoice-detail-modal.open {
+        position: static !important;
+        display: block !important;
+        visibility: visible !important;
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        inset: auto !important;
+      }
+      #invoice-detail-modal.open .modal {
+        position: static !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+        max-height: none !important;
+      }
+      #invoice-detail-body {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-invoice-sheet {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 4mm !important;
+        margin: 0 !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        box-sizing: border-box !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+      .inv-info-grid {
+        grid-template-columns: 1.2fr 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 12px !important;
+      }
+      .inv-items-table th,
+      .inv-items-table td {
+        padding: 6px 8px !important;
+        font-size: 0.8rem !important;
+      }
+      .inv-summary-section {
+        flex-direction: row !important;
+        align-items: flex-end !important;
+        margin-top: 8px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="main-nav">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Multi-branch stock, POS billing &amp; financial management.</p>
+      </div>
+      <nav class="nav-list"></nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+
+    <main class="main-area">
+      <header class="page-header stagger-1">
+        <div>
+          <h1 class="page-title">Sales &amp; POS Billing</h1>
+          <p class="page-subtitle">Search real-time branch stock, build customer invoices, print on 1 page, or share via WhatsApp.</p>
+        </div>
+      </header>
+
+      <!-- LIVE REVENUE KPIs -->
+      <div class="grid-3 stagger-1" style="margin-bottom: 20px;">
+        <article class="card stat-card price-safe-box" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: rgba(21, 128, 61, 0.15);">
+          <div class="stat-label">Today's Revenue</div>
+          <div class="stat-value currency" id="kpi-today" style="color: var(--green);">Rs 0</div>
+          <div class="stat-note">Sales processed today</div>
+        </article>
+        <article class="card stat-card price-safe-box">
+          <div class="stat-label">Last 7 Days</div>
+          <div class="stat-value currency" id="kpi-week">Rs 0</div>
+          <div class="stat-note">Rolling 7-day revenue</div>
+        </article>
+        <article class="card stat-card price-safe-box">
+          <div class="stat-label">This Month</div>
+          <div class="stat-value currency" id="kpi-month">Rs 0</div>
+          <div class="stat-note">Rolling 30-day revenue</div>
+        </article>
+      </div>
+
+      <div class="sales-grid stagger-2">
+        <!-- LEFT PANEL: INVOICE BUILDER -->
+        <section class="card">
+          <h2 class="section-title" style="margin-bottom: 14px;">Build New Customer Invoice</h2>
+
+          <div style="background: var(--surface-2); padding: 14px; border-radius: 14px; border: 1px solid var(--line); margin-bottom: 18px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 220px; position: relative;">
+              <input type="text" id="global-search-add" autocomplete="off" placeholder="Search by category (e.g. Washing Machine, AC), brand, model, or color..." style="width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--line-strong); font-size: 0.98rem;">
+              <div id="live-search-results" style="position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid var(--line-strong); border-radius: 12px; margin-top: 4px; box-shadow: 0 12px 28px rgba(0,0,0,0.15); z-index: 50; display: none; max-height: 320px; overflow-y: auto;"></div>
+            </div>
+            <button type="button" id="btn-search-add" class="btn" style="padding: 12px 20px; font-size: 0.95rem; font-weight: 800;">+ Add to Invoice</button>
+          </div>
+
+          <form id="sales-product-filter" class="toolbar-grid" style="margin-bottom: 18px; background: #f8fafc; border: 1px solid var(--line); border-radius: 14px; padding: 14px;">
+            <div class="field compact-field"><label>Company / Brand</label><select id="sales-company-filter"></select></div>
+            <div class="field compact-field"><label>Product Category</label><select id="sales-category-filter"></select></div>
+            <div class="field compact-field"><label>Model</label><select id="sales-model-filter"></select></div>
+            <div class="field compact-field">
+              <label>Availability</label>
+              <select id="sales-stock-only"><option value="in_stock">In stock only</option><option value="all">Show all</option></select>
+            </div>
+            <input type="hidden" id="sales-search-filter">
+          </form>
+
+          <form id="invoice-form" class="form-stack">
+            <div class="filter-grid" style="background: var(--surface-2); padding: 14px; border-radius: 14px; border: 1px solid var(--line);">
+              <div class="field"><label>Customer Name</label><input id="invoice-customer-name" type="text" placeholder="Enter customer full name" required></div>
+              <div class="field"><label>WhatsApp / Phone #</label><input id="invoice-phone" type="text" placeholder="e.g. 0300-1234567"></div>
+              <div class="field"><label>Payment Status</label><select id="invoice-status"><option value="Paid" selected>Paid</option><option value="Unpaid">Unpaid (Credit)</option></select></div>
+              <div class="field"><label>Date &amp; Time</label><input id="invoice-transaction-at" type="datetime-local" required></div>
+            </div>
+
+            <div class="grid-2">
+              <div class="field"><label>Customer Address (Optional)</label><input id="invoice-address" type="text" placeholder="Town, street, or area..."></div>
+              <div class="field"><label>Warranty / Delivery Notes (Optional)</label><input id="invoice-notes" type="text" placeholder="Serial #, warranty card note..."></div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <div class="section-title-row">
+                <h3 class="section-title" style="font-size: 1.08rem;">Selected Products</h3>
+                <button type="button" id="add-blank-row" class="btn-ghost small">+ Add Another Item</button>
+              </div>
+              <div id="invoice-items" class="line-items" style="margin-top: 10px;"></div>
+            </div>
+
+            <section class="helper-card" style="margin-top: 16px; background: var(--surface-2);">
+              <div class="section-title-row">
+                <h3 class="section-title" style="font-size: 1.05rem;">Invoice Discount</h3>
+                <div class="notice-inline">Optional fixed or percentage discount.</div>
+              </div>
+              <div class="filter-grid" style="align-items: center; margin-top: 10px;">
+                <div class="field" style="align-self: center;"><label style="cursor: pointer; display: flex; align-items: center; gap: 8px;"><input id="discount-enabled" type="checkbox" style="width: auto; min-height: auto;"> Apply discount</label></div>
+                <div class="field"><label>Preset</label><select id="discount-rule-select"><option value="">Custom / none</option></select></div>
+                <div class="field"><label>Type</label><select id="discount-type"><option value="fixed">Fixed (Rs)</option><option value="percent">Percent (%)</option></select></div>
+                <div class="field"><label>Value</label><input id="discount-value" type="number" min="0" step="0.01" value="0"></div>
+                <input type="hidden" id="discount-name">
+              </div>
+            </section>
+
+            <div class="invoice-summary-grid" style="margin-top: 14px;">
+              <article class="summary-card"><span class="summary-label">Subtotal</span><strong id="invoice-subtotal-preview" class="price-safe-box currency-inline">Rs 0</strong><small>Before discount</small></article>
+              <article class="summary-card"><span class="summary-label">Discount</span><strong id="invoice-discount-preview" class="price-safe-box currency-inline" style="color: var(--red);">Rs 0</strong><small id="invoice-discount-label">No discount applied</small></article>
+              <article class="summary-card total-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #bfdbfe;"><span class="summary-label" style="color: var(--blue-dark);">Grand Total</span><strong id="invoice-total-preview" class="price-safe-box currency-inline" style="color: var(--blue-dark); font-size: 1.65rem;">Rs 0</strong><small style="color: var(--blue-dark);">Net payable amount</small></article>
+            </div>
+
+            <div class="action-bar" style="margin-top: 10px;">
+              <button class="btn-accent" id="btn-confirm-sale" type="submit" style="width: 100%; font-size: 1.08rem; padding: 15px; font-weight: 800;">Confirm Sale &amp; Generate Invoice</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- RIGHT PANEL: SAVED INVOICES & DISCOUNTS -->
+        <div style="display: grid; gap: 18px; align-content: start;">
+          <section class="card">
+            <div class="section-title-row" style="flex-wrap: wrap; gap: 8px;">
+              <h2 class="section-title">Saved Invoices</h2>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button type="button" id="btn-today-sales" class="btn-ghost small active" style="font-weight: 800; border-color: var(--blue);">Today</button>
+                <button type="button" id="btn-show-all-sales" class="btn-ghost small">All History</button>
+                <button type="button" id="btn-refresh-history" class="btn-ghost small">Refresh</button>
+              </div>
+            </div>
+
+            <form id="invoice-filter-form" style="background: var(--surface-2); padding: 14px; border-radius: 14px; border: 1px solid var(--line); margin-bottom: 14px;">
+              <div class="filter-grid" style="gap: 10px; margin-bottom: 10px;">
+                <div class="field"><label style="font-size: 0.78rem;">Status</label><select id="invoice-status-filter" style="min-height: 38px;"><option value="">All Statuses</option><option value="Active">Active (Paid &amp; Unpaid)</option><option value="Paid">Paid</option><option value="Unpaid">Unpaid</option></select></div>
+                <div class="field"><label style="font-size: 0.78rem;">Customer / Invoice #</label><input id="invoice-customer-filter" type="text" style="min-height: 38px;" placeholder="Search name or #..."></div>
+                <div class="field"><label style="font-size: 0.78rem;">From</label><input id="invoice-start-date" type="date" style="min-height: 38px;"></div>
+                <div class="field"><label style="font-size: 0.78rem;">To</label><input id="invoice-end-date" type="date" style="min-height: 38px;"></div>
+              </div>
+              <button class="btn-dark small" type="submit" style="width: 100%;">Search Invoices</button>
+            </form>
+
+            <div id="invoice-list" class="record-list"><div class="empty-state">Loading invoices...</div></div>
+          </section>
+
+          <section class="card">
+            <div class="section-title-row"><h2 class="section-title">Discount Presets</h2><button class="btn-accent small" id="discount-new-rule" type="button">+ New Preset</button></div>
+            <div id="discount-rule-list" class="record-list" style="margin-top: 12px;"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- NEW DISCOUNT MODAL (Kept outside print scope) -->
+  <div class="modal-backdrop no-print" id="discount-rule-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2 id="discount-rule-modal-title">New Discount Preset</h2><button class="btn-ghost small" type="button" data-close-modal="discount-rule-modal">Close</button></div>
+      <form id="discount-rule-form" class="form-stack">
+        <input id="discount-rule-id" type="hidden">
+        <div class="field"><label for="discount-rule-name">Discount Name</label><input id="discount-rule-name" type="text" required></div>
+        <div class="grid-2">
+          <div class="field"><label for="discount-rule-type">Type</label><select id="discount-rule-type"><option value="fixed">Fixed amount</option><option value="percent">Percent</option></select></div>
+          <div class="field"><label for="discount-rule-value">Value</label><input id="discount-rule-value" type="number" min="0" step="0.01" value="0"></div>
+        </div>
+        <div class="field"><label for="discount-rule-description">Description</label><input id="discount-rule-description" type="text"></div>
+        <div class="field"><label><input id="discount-rule-active" type="checkbox" checked> Active</label></div>
+        <div id="discount-rule-form-message" class="form-message"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save Discount</button></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- SECURITY REVERSE & DELETE MODAL (WITH MOBILE BIOMETRIC SUPPORT) -->
+  <div class="modal-backdrop no-print" id="security-reverse-modal">
+    <div class="modal small" style="max-width: 440px;">
+      <div class="modal-header">
+        <h2 style="font-size: 1.15rem; color: var(--red);">Reverse &amp; Delete Sale</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="security-reverse-modal">Close</button>
+      </div>
+      <form id="security-reverse-form" class="form-stack">
+        <input id="security-reverse-invoice-id" type="hidden">
+        <p style="font-size: 0.88rem; color: var(--text); margin: 0; line-height: 1.45;">
+          This will permanently reverse this sale transaction, restore all sold inventory units back to stock, and remove the invoice.
+        </p>
+        <button type="button" id="btn-biometric-reverse-sale" class="btn" style="width: 100%; background: linear-gradient(135deg, #991b1b 0%, #dc2626 100%); color: #fff; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 13px; border-radius: 12px; font-weight: 800;">
+          <span>&#128274;</span> <span>Authorize with Fingerprint / Face ID</span>
+        </button>
+        <div style="text-align: center; font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800;">Or enter verification password</div>
+        <div class="field">
+          <label for="security-reverse-code" style="font-weight: 700;">Verification Password</label>
+          <input id="security-reverse-code" type="password" placeholder="Enter verification password" autocomplete="off" style="font-size: 1.02rem; padding: 10px;">
+        </div>
+        <div id="security-reverse-error" class="form-message" style="color: var(--red); font-size: 0.85rem; font-weight: 700;"></div>
+        <div class="action-bar" style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
+          <button class="btn-ghost small" type="button" data-close-modal="security-reverse-modal">Cancel</button>
+          <button class="btn-danger" type="submit" id="btn-submit-reverse">Delete &amp; Reverse</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- INVOICE DETAIL & SINGLE-PAGE PRINT MODAL (Placed as direct child of body for clean single-page print) -->
+  <div class="modal-backdrop" id="invoice-detail-modal">
+    <div class="modal" style="max-width: 840px;">
+      <div class="modal-header no-print">
+        <h2 id="invoice-detail-title">Invoice Detail</h2>
+        <button class="btn-ghost small" type="button" data-close-modal="invoice-detail-modal">Close</button>
+      </div>
+      <div id="invoice-detail-body"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20261111-v32"></script>
+  <script src="/static/js/sales.js?v=20261111-v32"></script>
+</body>
+</html>

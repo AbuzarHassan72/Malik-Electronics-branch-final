@@ -1,0 +1,523 @@
+/* ==========================================================================
+   Malik Electronics ERP — Stocks Page Stylesheet
+   Continuous Gemini Aurora Flow, Ambient Light Mesh, and Distinct Action Pills
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Gemini Aurora Keyframe Animations
+   -------------------------------------------------------------------------- */
+@keyframes geminiAuroraGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes geminiBackgroundFloat {
+  0% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+  50% {
+    background-position: 100% 50%, 0% 100%, 20% 80%;
+  }
+  100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%;
+  }
+}
+
+@keyframes geminiSoftPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+}
+
+@keyframes pulseStatusDot {
+  0% { transform: scale(0.9); opacity: 0.75; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.75; }
+}
+
+@keyframes stockFadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Ambient Animated Page Background
+   -------------------------------------------------------------------------- */
+.main-area {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 55% at 15% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 50% at 85% 20%, rgba(236, 72, 153, 0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 60% at 50% 90%, rgba(56, 189, 248, 0.12) 0%, transparent 70%),
+    #f8fafc;
+  background-size: 160% 160%, 150% 150%, 170% 170%, 100% 100%;
+  animation: geminiBackgroundFloat 22s ease-in-out infinite alternate;
+  min-height: 100vh;
+}
+
+/* --------------------------------------------------------------------------
+   Container & Company Blocks (Frosted Glass with Continuous Glow Bar)
+   -------------------------------------------------------------------------- */
+.stocks-section-list {
+  display: grid;
+  gap: 24px;
+  animation: stockFadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stock-company-block {
+  position: relative;
+  display: grid;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+/* Top Iridescent Glow Strip */
+.stock-company-block::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #06b6d4, #3b82f6);
+  background-size: 300% 300%;
+  animation: geminiAuroraGradient 6s ease infinite;
+}
+
+.stock-company-block:hover {
+  border-color: rgba(99, 102, 241, 0.28);
+  box-shadow: 0 18px 40px rgba(99, 102, 241, 0.08);
+}
+
+.stock-category-block {
+  display: grid;
+  gap: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Category Header & Metadata Chips
+   -------------------------------------------------------------------------- */
+.stock-category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.stock-category-title-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stock-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.stock-meta-line .chip {
+  font-size: 0.82rem;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.stock-meta-line .chip:hover {
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
+   Series Level Hierarchy
+   -------------------------------------------------------------------------- */
+.stock-series-group {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.stock-series-header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #4f46e5;
+  border-radius: 16px;
+  transition: transform 0.2s ease, border-left-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stock-series-header:hover {
+  transform: translateX(3px);
+  border-left-color: #ec4899;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+.stock-series-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stock-series-title h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 850;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.series-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, #0f172a, #1e1b4b, #312e81);
+  background-size: 200% 200%;
+  animation: geminiAuroraGradient 8s ease infinite;
+  color: #f8fafc;
+  box-shadow: 0 2px 8px rgba(30, 27, 75, 0.24);
+}
+
+.stock-series-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-series-meta .chip {
+  font-size: 0.8rem;
+  padding: 5px 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+/* --------------------------------------------------------------------------
+   Table Architecture & Column Control
+   -------------------------------------------------------------------------- */
+.stock-table-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.03);
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  min-width: 840px;
+}
+
+/* Strict Column Widths (Preserves room for Action buttons) */
+.stock-table th:nth-child(1),
+.stock-table td:nth-child(1) {
+  width: auto;
+  min-width: 280px;
+  text-align: left;
+}
+
+.stock-table th:nth-child(2),
+.stock-table td:nth-child(2) {
+  width: 110px;
+  text-align: center;
+}
+
+.stock-table th:nth-child(3),
+.stock-table td:nth-child(3) {
+  width: 140px;
+  text-align: center;
+}
+
+.stock-table th:nth-child(4),
+.stock-table td:nth-child(4) {
+  width: 240px; /* Ample space to prevent congestion */
+  text-align: right;
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid #edf1f6;
+  vertical-align: middle;
+}
+
+.stock-table th {
+  position: sticky;
+  top: 0;
+  background: #f8fafc;
+  z-index: 1;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 850;
+  border-bottom: 1px solid var(--line);
+}
+
+.stock-table tbody tr {
+  transition: background-color 0.16s ease, transform 0.16s ease;
+}
+
+.stock-table tbody tr:hover {
+  background-color: #fafcff;
+}
+
+.stock-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Model Cell */
+.stock-table .model-cell strong {
+  display: block;
+  font-size: 0.96rem;
+  font-weight: 780;
+  line-height: 1.4;
+  color: var(--text);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Quantity Cell */
+.stock-qty {
+  display: inline-block;
+  font-size: 1.1rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* Status Pills */
+.stock-status-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.stock-status-pill::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  animation: pulseStatusDot 2.2s infinite ease-in-out;
+}
+
+.stock-status-pill.in_stock {
+  color: #15803d;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.stock-status-pill.in_stock::before {
+  background: #16a34a;
+}
+
+.stock-status-pill.out_of_stock {
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.stock-status-pill.out_of_stock::before {
+  background: #dc2626;
+}
+
+/* --------------------------------------------------------------------------
+   Action Buttons: Distinct, Spaced, and Hover-Safe
+   -------------------------------------------------------------------------- */
+.stock-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* Manage Button: Soft frosted pill */
+.stock-btn-manage,
+.stock-actions a.btn-ghost:not([href*="/sales"]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155 !important;
+  font-size: 0.84rem;
+  font-weight: 750;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stock-btn-manage:hover,
+.stock-actions a.btn-ghost:not([href*="/sales"]):hover {
+  transform: translateY(-2px);
+  background: #ffffff !important;
+  border-color: #6366f1 !important;
+  color: #4f46e5 !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+}
+
+.stock-btn-manage:active,
+.stock-actions a.btn-ghost:not([href*="/sales"]):active {
+  transform: translateY(0);
+}
+
+/* Sales Button: Continuous iridescent Gemini Aurora pill */
+.stock-btn-sales,
+.stock-actions a[href*="/sales"] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 35%, #ec4899 70%, #2563eb 100%) !important;
+  background-size: 250% 250% !important;
+  animation: geminiAuroraGradient 4s ease infinite, geminiSoftPulse 3s infinite !important;
+  color: #ffffff !important;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Never turns white on hover */
+.stock-btn-sales:hover,
+.stock-actions a[href*="/sales"]:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 35%, #db2777 70%, #1d4ed8 100%) !important;
+  background-size: 250% 250% !important;
+  color: #ffffff !important;
+  filter: brightness(1.15) !important;
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 6px 20px rgba(236, 72, 153, 0.45) !important;
+}
+
+.stock-btn-sales:active,
+.stock-actions a[href*="/sales"]:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Company Filter Navigation ("All Companies")
+   -------------------------------------------------------------------------- */
+.company-filter-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface-2);
+  padding: 5px 6px 5px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+
+.company-filter-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.all-companies-btn {
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--text);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 0.86rem;
+  font-weight: 780;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.all-companies-btn:hover {
+  transform: translateY(-1px);
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.all-companies-btn.active {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+  background-size: 200% 200%;
+  animation: geminiAuroraGradient 6s ease infinite;
+  color: #ffffff;
+  border-color: #4338ca;
+  box-shadow: 0 6px 18px rgba(49, 46, 129, 0.32);
+  transform: scale(1.02);
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Breakpoints
+   -------------------------------------------------------------------------- */
+@media (max-width: 980px) {
+  .stock-category-head {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .stock-series-header {
+    flex-wrap: wrap;
+  }
+}

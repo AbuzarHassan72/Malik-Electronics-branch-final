@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | Authentication</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/login.css?v=20260407-v21-ui-safe">
+</head>
+<body class="login-page">
+  <main class="login-shell">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <!-- VIEW 1: AUTHENTICATION -->
+    <section id="login-view" class="card login-card">
+      <div class="login-head">
+        <div class="logo-mark">ME</div>
+        <div>
+          <h1 class="login-title">Sign in</h1>
+          <p class="login-copy">Authenticate to access the multi-branch management system.</p>
+        </div>
+      </div>
+      
+      <form id="login-form" class="form-stack">
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" type="text" autocomplete="username" placeholder="Enter username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
+            <button class="toggle-password" type="button" data-toggle-password="password">Show</button>
+          </div>
+        </div>
+        <div id="login-message" class="form-message"></div>
+        <div class="action-bar login-actions">
+          <button class="btn-accent" type="submit">Login</button>
+          <button class="btn-ghost" type="button" id="toggle-reset-btn">Change Security Settings</button>
+        </div>
+      </form>
+
+      <!-- SECURITY KEY PASSWORD UPDATE -->
+      <section id="credential-update-section" class="hidden login-reset-panel">
+        <div class="notice-card" style="margin-bottom:16px;">System Security Key required to change Login details. Passwords must be 6+ characters.</div>
+        <form id="credential-update-form" class="form-stack">
+          <div class="grid-2">
+            <div class="field">
+              <label for="current-username">Current username</label>
+              <input id="current-username" type="text" required>
+            </div>
+            <div class="field">
+              <label for="current-password">Current password</label>
+              <div class="password-wrap">
+                <input id="current-password" type="password" required>
+                <button class="toggle-password" type="button" data-toggle-password="current-password">Show</button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="security-key" style="color: var(--blue-dark);">System Security Key</label>
+            <input id="security-key" type="password" placeholder="Required for authorization" required>
+          </div>
+          <div class="grid-2">
+            <div class="field">
+              <label for="new-username">New username</label>
+              <input id="new-username" type="text" placeholder="Leave empty to keep current">
+            </div>
+            <div class="field">
+              <label for="new-password">New password</label>
+              <div class="password-wrap">
+                <input id="new-password" type="password" placeholder="Leave empty to keep current">
+                <button class="toggle-password" type="button" data-toggle-password="new-password">Show</button>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <label for="confirm-password">Confirm new password</label>
+            <input id="confirm-password" type="password" placeholder="Match new password">
+          </div>
+          <div id="credential-message" class="form-message"></div>
+          <div class="action-bar login-actions">
+            <button class="btn" type="submit">Save Changes</button>
+            <button class="btn-ghost" type="button" id="cancel-reset-btn">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </section>
+
+    <!-- VIEW 2: BRANCH SELECTION -->
+    <section id="branch-view" class="hidden">
+      <div class="branch-view-header">
+        <div>
+          <h1 class="login-title" style="color: rgb(21, 23, 97); text-shadow: 0 4px 12px rgba(0,0,0,0.2);">Select Branch</h1>
+          <p class="login-copy" style="color: rgba(21, 23, 97);">Choose an operational branch to continue.</p>
+        </div>
+        <button class="btn-ghost" style="background: rgba(255,255,255,0.1); color: rgb(21, 23, 97); border: 1px solid rgba(255,255,255,0.2);" type="button" id="signout-session-btn">Sign Out</button>
+      </div>
+      
+      <div id="branch-grid" class="branch-grid"></div>
+      
+      <div style="margin-top: 24px; text-align: center;">
+        <button class="btn-accent" type="button" id="btn-manage-branches" style="box-shadow: 0 10px 25px rgba(0,0,0,0.3);">Manage Branches</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- BRANCH MANAGEMENT MODAL -->
+  <div class="modal-backdrop" id="branch-modal">
+    <div class="modal small">
+      <div class="modal-header"><h2 id="branch-modal-title">New Branch</h2><button class="btn-ghost" type="button" data-close-modal="branch-modal">Close</button></div>
+      <form id="branch-form" class="form-stack">
+        <input id="branch-id" type="hidden">
+        <div class="field"><label for="branch-name">Branch Name</label><input id="branch-name" type="text" required></div>
+        <div class="field"><label for="branch-address">Address</label><input id="branch-address" type="text"></div>
+        <div class="field"><label for="branch-description">Description / Region</label><input id="branch-description" type="text"></div>
+        
+        <div class="grid-2">
+          <div class="field">
+            <label for="branch-status">Operational Status</label>
+            <select id="branch-status">
+              <option value="Active">Active (Open for business)</option>
+              <option value="Closed">Closed (Read-only history)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="branch-image-upload">Branch Photo (Optional)</label>
+            <input id="branch-image-upload" type="file" accept=".png,.jpg,.jpeg,.webp">
+            <input id="branch-image-path" type="hidden">
+          </div>
+        </div>
+        <div id="branch-form-message" class="form-message"></div>
+        <div class="action-bar"><button class="btn-accent" type="submit">Save Branch</button></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/login.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>

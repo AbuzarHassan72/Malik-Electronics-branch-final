@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Malik Electronic | History</title>
+  <link rel="icon" href="/static/favicon.svg?v=20260407-v21-ui-safe" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/css/base.css?v=20260407-v21-ui-safe">
+  <link rel="stylesheet" href="/static/css/history.css?v=20260407-v21-ui-safe">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-card">
+        <h1 class="brand-title">Malik Electronic</h1>
+        <p class="brand-subtitle">Professional stock, billing and account management for the shop owner.</p>
+      </div>
+      <nav class="nav-list">
+        <a class="nav-link" href="/dashboard"><span class="nav-dot"></span>Dashboard</a>
+        <a class="nav-link" href="/inventory"><span class="nav-dot"></span>Categories &amp; Location Management</a>
+                <a class="nav-link" href="/stocks"><span class="nav-dot"></span>Stocks</a>
+        <a class="nav-link" href="/sales"><span class="nav-dot"></span>Sales</a>
+        <a class="nav-link" href="/purchases"><span class="nav-dot"></span>Purchases</a>
+        <a class="nav-link" href="/accounts"><span class="nav-dot"></span>Accounts</a>
+        <a class="nav-link active" href="/history"><span class="nav-dot"></span>History</a>
+      </nav>
+      <div class="sidebar-footer"><button class="btn-danger" data-logout>Logout</button></div>
+    </aside>
+    <main class="main-area">
+      <header class="page-header">
+        <div>
+          <h1 class="page-title">History</h1>
+          <p class="page-subtitle">Dedicated history module for purchases, sales and account transactions with date, category, customer and supplier filters.</p>
+        </div>
+        <div class="top-badge" data-user-name></div>
+      </header>
+
+      <section class="card">
+        <div class="tab-strip">
+          <button class="tab-button active" data-tab="purchases">Purchase history</button>
+          <button class="tab-button" data-tab="sales">Sales history</button>
+          <button class="tab-button" data-tab="accounts">Account transactions</button>
+        </div>
+        <form id="history-filter-form" class="form-stack">
+          <div class="filter-grid">
+            <div class="field"><label>Category</label><select id="history-category"></select></div>
+            <div class="field"><label>Customer</label><input id="history-customer" type="text" placeholder="Used for sales and accounts"></div>
+            <div class="field"><label>Supplier</label><input id="history-supplier" type="text" placeholder="Used for purchases and accounts"></div>
+            <div class="field"><label>Start date</label><input id="history-start-date" type="date"></div>
+            <div class="field"><label>End date</label><input id="history-end-date" type="date"></div>
+          </div>
+          <button class="btn-accent" type="submit">Apply filters</button>
+        </form>
+      </section>
+
+      <section class="card" style="margin-top:18px;">
+        <div class="section-title-row"><h2 class="section-title">Results</h2></div>
+        <div id="history-results" class="record-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/js/shared.js?v=20260407-v21-ui-safe"></script>
+  <script src="/static/js/history.js?v=20260407-v21-ui-safe"></script>
+</body>
+</html>
