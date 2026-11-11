@@ -1,6 +1,6 @@
 /* ==========================================================================
-   MALIK ELECTRONIC ERP — SAMSUNG PK TYPOGRAPHY, PROPORTIONAL 100% ZOOM UI,
-   FIXED SIDEBAR & COMPLETE MOBILE RESPONSIVENESS
+   MALIK ELECTRONIC ERP — SAMSUNG PK DESIGN SYSTEM, SMOOTH ANIMATIONS,
+   SINGLE-LINE COMPANY TITLES & FLAGSHIP MOBILE UI
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
@@ -10,21 +10,59 @@
   --samsung-font-display: 'Samsung Sharp Sans', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --erp-navy: #000000;
   --erp-blue: #1428a0;
+  --erp-blue-glow: rgba(20, 40, 160, 0.14);
   --erp-border: #e5e7eb;
   --erp-surface: #ffffff;
-  --erp-bg: #f4f5f7;
+  --erp-bg: #f4f6f9;
   --erp-text: #000000;
   --erp-muted: #555555;
+  --spring-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   KEYFRAME ANIMATIONS
+   ========================================================================== */
+@keyframes erpFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes erpScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes erpPulseGlow {
+  0%, 100% {
+    box-shadow: 0 4px 16px rgba(20, 40, 160, 0.22);
+  }
+  50% {
+    box-shadow: 0 6px 24px rgba(20, 40, 160, 0.38);
+  }
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
   font-family: var(--samsung-font-main) !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   font-family: var(--samsung-font-main) !important;
   font-size: 15px;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -38,7 +76,7 @@ body {
   color: var(--erp-text) !important;
   font-family: var(--samsung-font-main) !important;
   letter-spacing: -0.01em;
-  line-height: 1.4;
+  line-height: 1.42;
 }
 
 h1, h2, h3, h4, h5, h6,
@@ -54,14 +92,14 @@ h1, h2, h3, h4, h5, h6,
   color: #000000;
 }
 
-/* Hide redundant center user badge & verbose helper text */
+/* Hide redundant center user badge */
 .top-badge[data-user-name],
 [data-user-name].top-badge {
   display: none !important;
 }
 
 /* ==========================================================================
-   DESKTOP FIXED / STATIC SIDEBAR (Fits 100% on Laptop Screens Without Cutoff)
+   DESKTOP FIXED / STATIC SIDEBAR (Fits 100% on Laptop Screens)
    ========================================================================== */
 @media (min-width: 981px) {
   .app-shell {
@@ -114,6 +152,7 @@ h1, h2, h3, h4, h5, h6,
   color: #ffffff !important;
   margin: 0 !important;
   line-height: 1.2 !important;
+  white-space: nowrap;
 }
 
 .brand-subtitle {
@@ -148,13 +187,15 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 600 !important;
   font-size: 0.85rem !important;
   text-decoration: none !important;
-  transition: all 0.18s ease !important;
+  transition: all 0.2s var(--spring-ease) !important;
   border: 1px solid transparent !important;
+  white-space: nowrap;
 }
 
 .nav-link:hover {
   background: rgba(255, 255, 255, 0.1) !important;
   color: #ffffff !important;
+  transform: translateX(3px);
 }
 
 .nav-link.active {
@@ -218,6 +259,9 @@ h1, h2, h3, h4, h5, h6,
 .sidebar-owner-role {
   font-size: 0.68rem;
   color: #a1a1aa;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-footer [data-logout] {
@@ -228,12 +272,13 @@ h1, h2, h3, h4, h5, h6,
 }
 
 /* ==========================================================================
-   MAIN CONTENT AREA & COMPACT SINGLE-LINE PAGE HEADER AT 100% ZOOM
+   MAIN CONTENT AREA & SINGLE-LINE HEADER
    ========================================================================== */
 .main-area {
   padding: 18px 22px !important;
   min-width: 0 !important;
   overflow-x: hidden !important;
+  animation: erpFadeInUp 0.35s var(--spring-ease) both;
 }
 
 .page-header {
@@ -245,10 +290,11 @@ h1, h2, h3, h4, h5, h6,
   gap: 16px !important;
   background: #ffffff !important;
   border: 1px solid var(--erp-border) !important;
-  border-radius: 16px !important;
+  border-radius: 18px !important;
   padding: 14px 20px !important;
   margin-bottom: 16px !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.025) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.035) !important;
+  animation: erpFadeInUp 0.3s var(--spring-ease) both;
 }
 
 .page-title {
@@ -283,11 +329,11 @@ h1, h2, h3, h4, h5, h6,
 
 #global-branch-switcher {
   width: auto !important;
-  min-width: 175px !important;
+  min-width: 170px !important;
   max-width: 220px !important;
   min-height: 38px !important;
   height: 38px !important;
-  padding: 0 32px 0 14px !important;
+  padding: 0 30px 0 14px !important;
   border-radius: 999px !important;
   border: 1.5px solid #d1d5db !important;
   font-size: 0.82rem !important;
@@ -311,7 +357,7 @@ h1, h2, h3, h4, h5, h6,
   gap: 6px !important;
 }
 
-/* Samsung Pill Buttons */
+/* Samsung Pill Buttons & Active Touch States */
 .btn,
 .btn-accent,
 .btn-dark,
@@ -320,7 +366,17 @@ h1, h2, h3, h4, h5, h6,
   border-radius: 999px !important;
   font-weight: 700 !important;
   letter-spacing: -0.01em !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition: transform 0.18s var(--spring-ease), box-shadow 0.18s var(--spring-ease), background-color 0.18s ease !important;
+}
+
+.btn:active,
+.btn-accent:active,
+.btn-dark:active,
+.btn-ghost:active,
+.btn-danger:active,
+.company-tile:active,
+.compact-category-card:active {
+  transform: scale(0.97) !important;
 }
 
 .btn-accent {
@@ -332,16 +388,18 @@ h1, h2, h3, h4, h5, h6,
 .btn-accent:hover {
   background: #1428a0 !important;
   border-color: #1428a0 !important;
+  box-shadow: 0 6px 18px rgba(20, 40, 160, 0.25) !important;
 }
 
-/* Proportional Cards & KPI Grid at 100% Zoom */
+/* Cards & KPI Grid */
 .card {
   background: #ffffff !important;
   border: 1px solid var(--erp-border) !important;
-  border-radius: 16px !important;
+  border-radius: 18px !important;
   padding: 16px 20px !important;
   margin-bottom: 16px !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.025) !important;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.03) !important;
+  animation: erpFadeInUp 0.38s var(--spring-ease) both;
 }
 
 .section-title {
@@ -364,9 +422,17 @@ h1, h2, h3, h4, h5, h6,
   background: #ffffff !important;
   border: 1px solid var(--erp-border) !important;
   border-radius: 16px !important;
-  padding: 14px 18px !important;
+  padding: 15px 18px !important;
   margin: 0 !important;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.025) !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03) !important;
+  transition: transform 0.22s var(--spring-ease), box-shadow 0.22s var(--spring-ease) !important;
+  animation: erpFadeInUp 0.35s var(--spring-ease) both;
+}
+
+.stat-card:hover,
+.kpi-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.07) !important;
 }
 
 .stat-label,
@@ -376,11 +442,14 @@ h1, h2, h3, h4, h5, h6,
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
   color: #555555 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-value,
 .kpi-box .value {
-  font-size: 1.75rem !important;
+  font-size: 1.7rem !important;
   font-weight: 800 !important;
   color: #000000 !important;
   margin: 4px 0 2px 0 !important;
@@ -388,14 +457,19 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .stat-note {
-  font-size: 0.75rem !important;
+  font-size: 0.74rem !important;
   color: #6b7280 !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Company Tiles Grid */
+/* ==========================================================================
+   COMPANY TILES (Strictly Single-Line Company Names + Smooth Hover/Tap)
+   ========================================================================== */
 .company-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
   gap: 12px !important;
   margin-top: 12px !important;
 }
@@ -403,43 +477,87 @@ h1, h2, h3, h4, h5, h6,
 .company-tile {
   background: #ffffff !important;
   border: 1.5px solid var(--erp-border) !important;
-  border-radius: 14px !important;
-  padding: 13px 14px !important;
+  border-radius: 16px !important;
+  padding: 14px !important;
   cursor: pointer !important;
-  transition: all 0.2s ease !important;
+  transition: transform 0.22s var(--spring-ease), box-shadow 0.22s var(--spring-ease), border-color 0.2s ease !important;
   display: flex !important;
   flex-direction: column !important;
   justify-content: space-between !important;
-  gap: 10px !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  animation: erpFadeInUp 0.35s var(--spring-ease) both;
 }
 
 .company-tile:hover {
-  transform: translateY(-2px) !important;
+  transform: translateY(-3px) !important;
   border-color: #000000 !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07) !important;
 }
 
 .company-tile.active {
-  border: 2px solid #000000 !important;
-  background: #f8faff !important;
-  box-shadow: 0 6px 18px rgba(20, 40, 160, 0.1) !important;
+  border: 2px solid #1428a0 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f4ff 100%) !important;
+  box-shadow: 0 8px 22px var(--erp-blue-glow) !important;
 }
 
+.company-tile-head {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.company-tile-head > div:last-child {
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+/* Guarantee Company Name is ALWAYS 1 single line */
 .company-tile-title {
   font-weight: 800 !important;
-  font-size: 0.95rem !important;
+  font-size: 0.96rem !important;
   color: #000000 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+  line-height: 1.25 !important;
 }
 
 .company-tile-meta {
-  font-size: 0.74rem !important;
+  font-size: 0.73rem !important;
   color: #6b7280 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  margin-top: 2px !important;
+}
+
+.company-tile-kpis {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.company-tile-kpis .metric-chip {
+  padding: 6px 10px !important;
+  border-radius: 10px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  min-width: 0 !important;
 }
 
 .company-logo-box {
   width: 46px !important;
   height: 46px !important;
-  border-radius: 10px !important;
+  border-radius: 12px !important;
   background: #ffffff !important;
   border: 1px solid #e5e7eb !important;
   display: flex !important;
@@ -461,9 +579,9 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .category-visual-box {
-  width: 46px !important;
-  height: 46px !important;
-  border-radius: 10px !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 12px !important;
   background: #f7f7f7 !important;
   border: 1px solid #e5e7eb !important;
   display: flex !important;
@@ -484,7 +602,7 @@ h1, h2, h3, h4, h5, h6,
 /* Category Cards Grid */
 .compact-category-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)) !important;
   gap: 12px !important;
   margin-top: 12px !important;
 }
@@ -492,38 +610,98 @@ h1, h2, h3, h4, h5, h6,
 .compact-category-card {
   background: #ffffff !important;
   border: 1.5px solid var(--erp-border) !important;
-  border-radius: 14px !important;
-  padding: 14px !important;
-  transition: all 0.2s ease !important;
+  border-radius: 16px !important;
+  padding: 15px !important;
+  transition: transform 0.22s var(--spring-ease), box-shadow 0.22s var(--spring-ease), border-color 0.2s ease !important;
+  animation: erpFadeInUp 0.35s var(--spring-ease) both;
 }
 
 .compact-category-card:hover {
-  transform: translateY(-2px) !important;
+  transform: translateY(-3px) !important;
   border-color: #000000 !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.07) !important;
+}
+
+.compact-category-title {
+  font-weight: 800 !important;
+  font-size: 0.96rem !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ==========================================================================
+   MODALS & PASSWORD INPUT FIX (No Clipped Placeholders on Mobile)
+   ========================================================================== */
+.modal-backdrop.open {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-backdrop.open .modal {
+  animation: erpScaleIn 0.28s var(--spring-ease) both;
+}
+
+.password-wrap {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.password-wrap input {
+  width: 100% !important;
+  padding-right: 68px !important;
+  font-size: 0.95rem !important;
+  border-radius: 12px !important;
+}
+
+.password-wrap .toggle-password {
+  position: absolute !important;
+  right: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important;
+  cursor: pointer !important;
+}
+
+#btn-biometric-acc-unlock,
+#btn-biometric-price-toggle,
+#btn-biometric-reverse-sale,
+#btn-biometric-reverse-purchase {
+  animation: erpPulseGlow 2.6s infinite ease-in-out;
 }
 
 /* Mobile Top Bar & Drawer Navigation (Hidden on Desktop) */
 .mobile-topbar {
   display: none;
-  background: #000000;
+  background: rgba(0, 0, 0, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #ffffff;
-  padding: 10px 14px;
+  padding: 11px 14px;
   align-items: center;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 1100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .mobile-menu-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   color: #ffffff;
   border-radius: 999px;
-  padding: 6px 12px;
+  padding: 7px 13px;
   font-weight: 700;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -534,8 +712,8 @@ h1, h2, h3, h4, h5, h6,
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(3px);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   z-index: 1150;
 }
 
@@ -557,11 +735,11 @@ h1, h2, h3, h4, h5, h6,
     top: 0 !important;
     left: 0 !important;
     bottom: 0 !important;
-    width: 265px !important;
-    max-width: 84vw !important;
+    width: 270px !important;
+    max-width: 82vw !important;
     height: 100vh !important;
     transform: translateX(-105%) !important;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: transform 0.28s var(--spring-ease) !important;
     z-index: 1200 !important;
   }
 
@@ -575,40 +753,99 @@ h1, h2, h3, h4, h5, h6,
 
   .main-area {
     margin-left: 0 !important;
-    padding: 12px 12px 24px 12px !important;
+    padding: 12px 12px 28px 12px !important;
     width: 100% !important;
   }
 
   .page-header {
-    padding: 12px 14px !important;
+    padding: 14px 15px !important;
     flex-direction: column !important;
     align-items: stretch !important;
     flex-wrap: wrap !important;
+    gap: 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .page-title {
+    font-size: 1.22rem !important;
   }
 
   #global-header-controls {
     width: 100% !important;
-    justify-content: space-between !important;
-    flex-wrap: wrap !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 8px !important;
   }
 
   #global-branch-switcher {
-    flex: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
     max-width: none !important;
+    font-size: 0.8rem !important;
+  }
+
+  #global-price-lock-btn {
+    padding: 0 14px !important;
+    font-size: 0.8rem !important;
   }
 
   #dashboard-stats,
   #account-stats,
   #category-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
 
+  .stat-card,
+  .kpi-box {
+    padding: 13px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  .stat-value,
+  .kpi-box .value {
+    font-size: 1.38rem !important;
+  }
+
+  /* Company Cards on Mobile: Horizontal Single-Line Layout so names NEVER wrap onto 2 lines */
+  .company-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .company-tile {
+    padding: 13px 14px !important;
+    border-radius: 15px !important;
+    gap: 10px !important;
+  }
+
+  .company-tile-head {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  .company-tile-title {
+    font-size: 1rem !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .company-tile-kpis {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+
+  .compact-category-grid,
+  .model-grid,
   .management-grid,
   .purchase-page-grid,
   .sales-grid,
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 
   .single-line-filters,
@@ -627,16 +864,6 @@ h1, h2, h3, h4, h5, h6,
     grid-template-columns: 1fr !important;
   }
 
-  .company-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 10px !important;
-  }
-
-  .compact-category-grid,
-  .model-grid {
-    grid-template-columns: 1fr !important;
-  }
-
   .purchase-table-wrap,
   .stock-table-wrap,
   #company-analysis-table-wrap,
@@ -644,5 +871,20 @@ h1, h2, h3, h4, h5, h6,
     width: 100% !important;
     max-width: 100% !important;
     overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-backdrop {
+    padding: 12px !important;
+    align-items: center !important;
+  }
+
+  .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    padding: 18px 16px !important;
+    border-radius: 20px !important;
   }
 }
