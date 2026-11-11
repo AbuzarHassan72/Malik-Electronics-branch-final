@@ -78,7 +78,8 @@ from .schemas import (
 FRONTEND_DIR = frontend_dir()
 ASSETS_DIR = assets_dir()
 BACKEND_ROOT_UPLOADS = Path(__file__).resolve().parent.parent / "uploads"
-MEDIA_DIR = BACKEND_ROOT_UPLOADS if BACKEND_ROOT_UPLOADS.exists() else (DATA_DIR / "uploads")
+IS_VERCEL = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
+MEDIA_DIR = (Path("/tmp/malik_uploads") if IS_VERCEL else (BACKEND_ROOT_UPLOADS if BACKEND_ROOT_UPLOADS.exists() else (DATA_DIR / "uploads")))
 MEDIA_DIR.mkdir(parents=True, exist_ok=True)
 DEFAULT_USERNAME = "Malik Alyas"
 DEFAULT_PASSWORD = "malik123"

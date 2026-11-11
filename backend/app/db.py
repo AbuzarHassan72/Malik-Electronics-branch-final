@@ -51,8 +51,13 @@ def _load_env_files() -> None:
 
 _load_env_files()
 
-DATA_DIR = persistent_data_dir()
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+IS_VERCEL = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
+DATA_DIR = Path("/tmp/malik_data") if IS_VERCEL else persistent_data_dir()
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    DATA_DIR = Path("/tmp/malik_data")
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
 CATALOG_SEED_PATH = catalog_seed_path()
 
 
@@ -76,7 +81,7 @@ RAW_DATABASE_URL = (
 
 USE_POSTGRES = bool(RAW_DATABASE_URL)
 POSTGRES_DSN = _clean_postgres_dsn(RAW_DATABASE_URL) if USE_POSTGRES else ""
-DB_PATH = (DATA_DIR / "malik_electronic_pro_v4.db") if USE_POSTGRES else ensure_persistent_db()
+DB_PATH = (DATA_DIR / "malik_electronic_pro_v4.db") if (USE_POSTGRES or IS_VERCEL) else ensure_persistent_db()
 
 # High-speed read-through cache (automatically invalidated on any INSERT/UPDATE/DELETE)
 _QUERY_CACHE: dict[tuple[str, tuple[Any, ...]], tuple[float, list[dict[str, Any]]]] = {}
