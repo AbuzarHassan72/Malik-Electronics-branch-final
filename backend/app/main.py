@@ -879,21 +879,30 @@ def get_products_data(
             COALESCE(sa.qty, 0) AS total_sold_qty,
             COALESCE(sa.revenue, 0) AS total_sales_value,
             COALESCE(sa.profit, 0) AS total_profit,
-            (SELECT pe2.unit_cost FROM purchase_entries pe2 WHERE pe2.product_id = p.id ORDER BY pe2.purchase_date DESC, pe2.id DESC LIMIT 1) AS last_purchase_price,
-            (SELECT pe2.purchase_date FROM purchase_entries pe2 WHERE pe2.product_id = p.id ORDER BY pe2.purchase_date DESC, pe2.id DESC LIMIT 1) AS last_purchase_date,
-            (SELECT pe2.supplier_name FROM purchase_entries pe2 WHERE pe2.product_id = p.id ORDER BY pe2.purchase_date DESC, pe2.id DESC LIMIT 1) AS last_supplier_name,
-            (SELECT se2.unit_price FROM sale_entries se2 WHERE se2.product_id = p.id ORDER BY coalesce(se2.transaction_at, se2.sale_date) DESC, se2.id DESC LIMIT 1) AS last_sale_price,
-            (SELECT se2.sale_date FROM sale_entries se2 WHERE se2.product_id = p.id ORDER BY coalesce(se2.transaction_at, se2.sale_date) DESC, se2.id DESC LIMIT 1) AS last_sale_date,
-            (SELECT se2.customer_name FROM sale_entries se2 WHERE se2.product_id = p.id ORDER BY coalesce(se2.transaction_at, se2.sale_date) DESC, se2.id DESC LIMIT 1) AS last_customer_name
+            COALESCE(pu.last_cost, p.default_purchase_price, 0) AS last_purchase_price,
+            COALESCE(pu.last_date, '') AS last_purchase_date,
+            '' AS last_supplier_name,
+            COALESCE(sa.last_price, p.default_sale_price, 0) AS last_sale_price,
+            COALESCE(sa.last_date, '') AS last_sale_date,
+            '' AS last_customer_name
         FROM products p
         JOIN categories c ON c.id = p.category_id AND c.branch_id = p.branch_id
         LEFT JOIN locations l ON l.id = p.location_id AND l.branch_id = p.branch_id
         LEFT JOIN (
-            SELECT product_id, SUM(quantity) AS qty, SUM(quantity * unit_cost) AS value
+            SELECT product_id,
+                   SUM(quantity) AS qty,
+                   SUM(quantity * unit_cost) AS value,
+                   MAX(unit_cost) AS last_cost,
+                   MAX(purchase_date) AS last_date
             FROM purchase_entries WHERE branch_id = ? GROUP BY product_id
         ) pu ON pu.product_id = p.id
         LEFT JOIN (
-            SELECT se.product_id, SUM(se.quantity) AS qty, ROUND(SUM(COALESCE(ii.total_price, se.quantity * se.unit_price)), 2) AS revenue, SUM(se.total_profit) AS profit
+            SELECT se.product_id,
+                   SUM(se.quantity) AS qty,
+                   ROUND(CAST(SUM(COALESCE(ii.total_price, se.quantity * se.unit_price)) AS NUMERIC), 2) AS revenue,
+                   SUM(se.total_profit) AS profit,
+                   MAX(se.unit_price) AS last_price,
+                   MAX(se.sale_date) AS last_date
             FROM sale_entries se
             LEFT JOIN invoice_items ii ON ii.sale_entry_id = se.id AND ii.branch_id = se.branch_id
             WHERE se.branch_id = ? GROUP BY se.product_id
