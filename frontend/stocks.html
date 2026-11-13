@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/static/css/stocks.css?v=20260407-v21-ui-safe">
   <style>
     .stock-table-wrap {
-      overflow-x: hidden !important;
+      overflow-x: auto !important;
       width: 100% !important;
       border-radius: 14px;
       border: 1px solid var(--line);
@@ -39,6 +39,73 @@
     .stock-table tr:hover td {
       background: #fafcff;
     }
+    /* Native Mobile Card Layout for Stock Table (Zero Horizontal Cutoff on Phones) */
+    @media (max-width: 768px) {
+      #stocks-results .stock-table {
+        min-width: 100% !important;
+        display: block !important;
+      }
+      #stocks-results .stock-table thead {
+        display: none !important;
+      }
+      #stocks-results .stock-table tbody {
+        display: grid !important;
+        gap: 12px !important;
+        padding: 12px !important;
+      }
+      #stocks-results .stock-table tbody tr {
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        gap: 10px !important;
+        padding: 14px !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 14px !important;
+        background: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+      }
+      #stocks-results .stock-table tbody td {
+        padding: 0 !important;
+        border: none !important;
+        width: auto !important;
+        min-width: 0 !important;
+      }
+      /* Cell 1: Model Name (Top Left) */
+      #stocks-results .stock-table tbody td:nth-child(1) {
+        grid-column: 1 / 2 !important;
+        grid-row: 1 / 2 !important;
+        align-self: center !important;
+      }
+      /* Cell 3: Total Stock Badge (Top Right) */
+      #stocks-results .stock-table tbody td:nth-child(3) {
+        grid-column: 2 / 3 !important;
+        grid-row: 1 / 2 !important;
+        align-self: start !important;
+      }
+      /* Cell 2: Color & Location Breakdown (Full Width Middle) */
+      #stocks-results .stock-table tbody td:nth-child(2) {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 / 3 !important;
+      }
+      /* Cell 4: Manage & Sales Buttons (Full Width Bottom) */
+      #stocks-results .stock-table tbody td:nth-child(4) {
+        grid-column: 1 / -1 !important;
+        grid-row: 3 / 4 !important;
+        padding-top: 6px !important;
+        border-top: 1px dashed #e2e8f0 !important;
+      }
+      #stocks-results .stock-table tbody td:nth-child(4) > div {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        width: 100% !important;
+        gap: 8px !important;
+      }
+      #stocks-results .stock-table tbody td:nth-child(4) a {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 10px 14px !important;
+      }
+    }
+    
     .btn-stock-manage {
       background: #ffffff;
       color: #0f172a;

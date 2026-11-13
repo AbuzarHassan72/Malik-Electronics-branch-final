@@ -25,7 +25,7 @@
     /* Executive Metric Pill Cards (COLORS / LOCATIONS / AMOUNT) */
     .executive-metric-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
       margin: 14px 0;
     }
@@ -37,6 +37,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      min-width: 0;
+      overflow: hidden;
       transition: all 0.2s ease;
     }
     .exec-metric-card:hover {
@@ -44,17 +46,37 @@
       border-color: #cbd5e1;
     }
     .exec-metric-label {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.04em;
       color: #64748b;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+      white-space: nowrap;
     }
     .exec-metric-val {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 900;
       color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 640px) {
+      .executive-metric-grid {
+        grid-template-columns: 1fr 1fr !important;
+      }
+      .executive-metric-grid .exec-metric-card:last-child {
+        grid-column: 1 / -1 !important;
+      }
+      .model-browser-head {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+      }
     }
     /* Self-explanatory Color-Location Breakdown inside Category Card */
     .exec-breakdown-box {

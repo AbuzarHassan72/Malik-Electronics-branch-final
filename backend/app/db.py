@@ -279,6 +279,19 @@ def dict_from_row(row: Any) -> dict[str, Any] | None:
 
 
 _PG_POOL: Any = None
+_CONN_LAST_USED: dict[int, float] = {}
+
+
+def _open_fresh_pg_conn():
+    return psycopg2.connect(
+        POSTGRES_DSN,
+        connect_timeout=5,
+        keepalives=1,
+        keepalives_idle=15,
+        keepalives_interval=5,
+        keepalives_count=3,
+        options="-c statement_timeout=15000",
+    )
 
 
 def _get_pg_pool():
@@ -287,14 +300,15 @@ def _get_pg_pool():
         raise RuntimeError("psycopg2-binary is required for Neon PostgreSQL.")
     if _PG_POOL is None:
         _PG_POOL = psycopg2.pool.ThreadedConnectionPool(
-            minconn=2,
-            maxconn=16,
+            minconn=1,
+            maxconn=10,
             dsn=POSTGRES_DSN,
-            connect_timeout=15,
+            connect_timeout=5,
             keepalives=1,
-            keepalives_idle=30,
-            keepalives_interval=10,
-            keepalives_count=5,
+            keepalives_idle=15,
+            keepalives_interval=5,
+            keepalives_count=3,
+            options="-c statement_timeout=15000",
         )
     return _PG_POOL
 
@@ -303,12 +317,20 @@ def get_connection():
     if USE_POSTGRES:
         pool = _get_pg_pool()
         conn = pool.getconn()
-        if getattr(conn, "closed", 0) != 0:
+        conn_id = id(conn)
+        now = time.time()
+        last_used = _CONN_LAST_USED.get(conn_id, 0.0)
+
+        # If connection was idle > 10s (e.g. Vercel serverless container freeze), replace immediately so it never hangs
+        if getattr(conn, "closed", 0) != 0 or (last_used > 0 and (now - last_used) > 10.0):
             try:
                 pool.putconn(conn, close=True)
             except Exception:
                 pass
-            conn = psycopg2.connect(POSTGRES_DSN, connect_timeout=15)
+            conn = _open_fresh_pg_conn()
+            conn_id = id(conn)
+
+        _CONN_LAST_USED[conn_id] = now
         return conn
 
     conn = sqlite3.connect(DB_PATH, timeout=30, check_same_thread=False)
@@ -335,12 +357,15 @@ def get_db_cursor(commit: bool = False):
             yield conn, wrapped_cur
             if commit:
                 conn.commit()
+            _CONN_LAST_USED[id(conn)] = time.time()
         except (psycopg2.OperationalError, psycopg2.InterfaceError):
+            _CONN_LAST_USED.pop(id(conn), None)
             try:
                 pool.putconn(conn, close=True)
             except Exception:
                 pass
-            conn = psycopg2.connect(POSTGRES_DSN, connect_timeout=15)
+            conn = _open_fresh_pg_conn()
+            _CONN_LAST_USED[id(conn)] = time.time()
             raw_cur = conn.cursor()
             wrapped_cur = PostgresCursorWrapper(raw_cur)
             yield conn, wrapped_cur

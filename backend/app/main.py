@@ -331,16 +331,12 @@ def _sync_client_images_to_db() -> None:
 
 @app.on_event("startup")
 def startup_event():
+    if os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("NEON_DATABASE_URL"):
+        logger.info("Fast startup complete: connected directly to Neon PostgreSQL.")
+        return
     initialize_database()
     ensure_default_owner()
     _sync_client_images_to_db()
-    try:
-        execute("CREATE INDEX IF NOT EXISTS idx_fast_pe_pid ON purchase_entries(product_id);")
-        execute("CREATE INDEX IF NOT EXISTS idx_fast_se_pid ON sale_entries(product_id);")
-        execute("CREATE INDEX IF NOT EXISTS idx_fast_prod_branch ON products(branch_id, active);")
-        execute("DELETE FROM account_transactions WHERE party_name LIKE 'Internal%' OR description LIKE '%TRANSFER%';")
-    except Exception as e:
-        logger.warning(f"Index/cleanup notice: {e}")
     logger.info("Application startup complete with DB at %s", DATA_DIR)
 
 
@@ -573,15 +569,40 @@ def normalize_username(value: str) -> str:
     return " ".join((value or "").strip().split())
 
 
+KNOWN_BRAND_CANONICAL = {
+    "dawlance": "Dawlance",
+    "haier": "Haier",
+    "anex": "Anex",
+    "asia": "Asia",
+    "super asia": "Super Asia",
+    "bonus": "Bonus",
+    "bouns": "Bouns",
+    "eco plus led": "Eco Plus Led",
+    "ecoplus": "Eco Plus Led",
+    "gas stove": "GAS Stove",
+    "kenwood": "Kenwood",
+    "national": "National",
+    "nasgas": "Nasgas",
+    "nexen": "Nexen",
+    "royal": "Royal",
+    "samford": "Samford",
+    "super flame": "Super Flame",
+    "united": "United",
+    "westpoint": "Westpoint",
+}
+
+
 def canonical_company_name(value: str | None) -> str:
     raw = " ".join((value or "").strip().split())
     if not raw:
         return ""
-    alias = COMPANY_ALIASES.get(normalize_key(raw))
-    if alias:
-        return alias
+    key = normalize_key(raw)
+    if key in COMPANY_ALIASES:
+        return COMPANY_ALIASES[key]
+    if key in KNOWN_BRAND_CANONICAL:
+        return KNOWN_BRAND_CANONICAL[key]
     for company in TOP_COMPANIES:
-        if normalize_key(company) == normalize_key(raw):
+        if normalize_key(company) == key:
             return company
     return raw
 
@@ -1154,24 +1175,38 @@ def build_sale_signature(customer_name: str, transaction_at: str, items: list[di
     return f"{branch_id}|{normalized_customer}|{minute_bucket}|{'|'.join(normalized_items)}"
 
 
+def _norm_cat_key(name: str | None) -> str:
+    k = normalize_key(name or "")
+    return k[:-1] if len(k) > 4 and k.endswith("s") else k
+
+
 def _catalog_rows_for_category(category_name: str, company: str | None = None, branch_id: int = 1) -> list[dict]:
-    conditions = ["category_key = ?", "branch_id = ?"]
-    params: list = [normalize_key(category_name), branch_id]
-    if company:
-        conditions.append("company_key = ?")
-        params.append(normalize_key(canonical_company_name(company)))
-    rows = fetch_all(
-        f"SELECT * FROM catalog_models WHERE {' AND '.join(conditions)} ORDER BY company ASC, series ASC, model ASC",
-        tuple(params),
+    target_cat = _norm_cat_key(category_name)
+    target_comp = normalize_key(canonical_company_name(company)) if company else ""
+    all_rows = fetch_all(
+        "SELECT * FROM catalog_models WHERE branch_id = ? ORDER BY company ASC, series ASC, model ASC",
+        (branch_id,),
     )
-    return rows
+    matched = []
+    for r in all_rows:
+        if _norm_cat_key(r.get("category_name") or r.get("category_key")) != target_cat:
+            continue
+        if target_comp and normalize_key(canonical_company_name(r.get("company"))) != target_comp:
+            continue
+        matched.append(r)
+    return matched
 
 
 def _build_master_model_rows(category_id: int, company: str | None = None, branch_id: int = 1) -> tuple[dict, list[dict], list[dict]]:
     category = _category_exists(category_id, branch_id)
     category_name = category["name"]
+    target_cat_norm = _norm_cat_key(category_name)
     selected_company = canonical_company_name(company) if company else ""
-    variants = get_products_data(category_id=category_id, branch_id=branch_id)
+    all_branch_variants = get_products_data(branch_id=branch_id)
+    variants = [
+        v for v in all_branch_variants
+        if v["category_id"] == category_id or _norm_cat_key(v.get("category_name")) == target_cat_norm
+    ]
     catalog_rows = _catalog_rows_for_category(category_name, selected_company or None, branch_id=branch_id)
     master_map: dict[tuple[str, str, str], dict] = {}
 
@@ -1524,15 +1559,33 @@ def build_dashboard_insights(
         })
 
     selected_comp_key = normalize_key(selected_company)
-    selected_comp_catalog = catalog_by_comp.get(selected_comp_key, [])
-    selected_comp_inventory = [row for row in inventory if canonical_company_name(row.get("company")) == selected_company]
+    selected_comp_catalog = [
+        cm for cm in all_catalog
+        if normalize_key(canonical_company_name(cm.get("company"))) == selected_comp_key
+    ]
+    selected_comp_inventory = [
+        row for row in inventory
+        if normalize_key(canonical_company_name(row.get("company"))) == selected_comp_key
+    ]
 
     category_cards = []
+    seen_cat_norms: set[str] = set()
     for category in categories:
         cat_id = category["id"]
-        cat_key = normalize_key(category["name"])
-        cat_inv = [row for row in selected_comp_inventory if row["category_id"] == cat_id]
-        cat_catalog = [row for row in selected_comp_catalog if (row.get("category_key") or normalize_key(row.get("category_name"))) == cat_key]
+        cat_norm = _norm_cat_key(category["name"])
+        if cat_norm in seen_cat_norms:
+            continue
+        cat_inv = [
+            row for row in selected_comp_inventory
+            if row["category_id"] == cat_id or _norm_cat_key(row.get("category_name")) == cat_norm
+        ]
+        cat_catalog = [
+            row for row in selected_comp_catalog
+            if _norm_cat_key(row.get("category_name") or row.get("category_key")) == cat_norm
+        ]
+        if not cat_inv and not cat_catalog:
+            continue
+        seen_cat_norms.add(cat_norm)
 
         if not cat_inv and not cat_catalog:
             continue
