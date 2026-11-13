@@ -167,18 +167,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnLang = document.getElementById('btn-toggle-lang');
     if (btnLang) btnLang.textContent = isUrdu ? URDU_DICT.langBtn : URDU_DICT.langBtnEn;
 
-    document.getElementById('txt-acc-title').textContent = isUrdu ? URDU_DICT.title : 'Financial Accounts & Audit';
-    document.getElementById('txt-acc-subtitle').textContent = isUrdu ? URDU_DICT.subtitle : 'Comprehensive transaction analysis, company performance, and multi-format reporting.';
-    document.getElementById('txt-label-period').textContent = isUrdu ? URDU_DICT.periodLabel : 'Reporting Period';
-    document.getElementById('txt-filter-company').textContent = isUrdu ? URDU_DICT.companyLabel : 'Company / Brand';
+    document.getElementById('txt-acc-title').textContent = isUrdu ? URDU_DICT.title : 'Accounts';
+    document.getElementById('txt-acc-subtitle').textContent = isUrdu ? URDU_DICT.subtitle : 'Check daily sales, purchases, profit, and bills.';
+    document.getElementById('txt-label-period').textContent = isUrdu ? URDU_DICT.periodLabel : 'Select Time';
+    document.getElementById('txt-filter-company').textContent = isUrdu ? URDU_DICT.companyLabel : 'Company';
     document.getElementById('txt-filter-start').textContent = isUrdu ? URDU_DICT.startDateLabel : 'From Date';
     document.getElementById('txt-filter-end').textContent = isUrdu ? URDU_DICT.endDateLabel : 'To Date';
-    document.getElementById('acc-search-input').placeholder = isUrdu ? URDU_DICT.searchPlaceholder : 'Invoice #, customer, phone...';
-    document.getElementById('btn-apply-filters').textContent = isUrdu ? URDU_DICT.filterBtn : 'Filter';
-    document.getElementById('txt-company-analysis-title').textContent = isUrdu ? URDU_DICT.companyTitle : 'Company-Wise Performance';
-    document.getElementById('txt-company-analysis-subtitle').textContent = isUrdu ? URDU_DICT.companySubtitle : 'Live breakdown across all brands registered in this branch for the selected period.';
-    document.getElementById('tab-btn-sales').textContent = isUrdu ? URDU_DICT.tabSales : 'Sales Invoices';
-    document.getElementById('tab-btn-purchases').textContent = isUrdu ? URDU_DICT.tabPurchases : 'Purchase Invoices';
+    document.getElementById('acc-search-input').placeholder = isUrdu ? URDU_DICT.searchPlaceholder : 'Search bill #, name, phone...';
+    document.getElementById('btn-apply-filters').textContent = isUrdu ? URDU_DICT.filterBtn : 'Search';
+    document.getElementById('txt-company-analysis-title').textContent = isUrdu ? URDU_DICT.companyTitle : 'Company Summary';
+    document.getElementById('txt-company-analysis-subtitle').textContent = isUrdu ? URDU_DICT.companySubtitle : 'Sales, purchases, profit, and stock for each company.';
+    document.getElementById('tab-btn-sales').textContent = isUrdu ? URDU_DICT.tabSales : 'Sale Bills';
+    document.getElementById('tab-btn-purchases').textContent = isUrdu ? URDU_DICT.tabPurchases : 'Purchase Bills';
 
     document.querySelectorAll('#period-presets-strip [data-period]').forEach(btn => {
       const pKey = btn.dataset.period;
@@ -248,10 +248,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const cards = [
-      { label: `${prefix} ${isUrdu ? 'سیلز آمدنی' : 'Sales Revenue'}`, val: s.sales_total, color: 'var(--green)', note: `${s.sales_count || 0} ${isUrdu ? 'بل' : 'Invoices'}` },
-      { label: `${prefix} ${isUrdu ? 'پرچیز لاگت' : 'Purchases Spend'}`, val: s.purchase_total, color: 'var(--blue-dark)', note: `${s.purchase_count || 0} ${isUrdu ? 'بل' : 'Invoices'}` },
-      { label: `${prefix} ${isUrdu ? 'مجموعی منافع' : 'Gross Profit'}`, val: s.gross_profit, color: '#b45309', note: `${s.sold_units || 0} ${isUrdu ? 'اشیاء فروخت' : 'Items Sold'}` },
-      { label: isUrdu ? 'موجودہ سٹاک مالیت' : 'Current Stock Valuation', val: s.current_stock_value, color: 'var(--text)', note: `${s.current_stock_units || 0} ${isUrdu ? 'سٹاک میں موجود' : 'Units in Stock'}` },
+      { label: `${prefix} ${isUrdu ? 'سیلز' : 'Total Sales'}`, val: s.sales_total, color: 'var(--green)', note: `${s.sales_count || 0} ${isUrdu ? 'انوائسز' : 'Sale Bills'}` },
+      { label: `${prefix} ${isUrdu ? 'خریداری' : 'Total Purchases'}`, val: s.purchase_total, color: 'var(--blue-dark)', note: `${s.purchase_count || 0} ${isUrdu ? 'انوائسز' : 'Purchase Bills'}` },
+      { label: `${prefix} ${isUrdu ? 'منافع' : 'Profit'}`, val: s.gross_profit, color: '#b45309', note: `${s.sold_units || 0} ${isUrdu ? 'فروخت شدہ آئٹمز' : 'Items Sold'}` },
+      { label: isUrdu ? 'موجودہ اسٹاک ویلیو' : 'Stock Value', val: s.current_stock_value, color: 'var(--text)', note: `${s.current_stock_units || 0} ${isUrdu ? 'موجودہ یونٹس' : 'Items in Stock'}` },
     ];
 
     document.getElementById('account-stats').innerHTML = cards.map(c => `

@@ -106,8 +106,8 @@ function renderStocksSummary() {
   wrap.innerHTML = `
     <div class="summary-pill">Companies: <strong>${companyCount}</strong></div>
     <div class="summary-pill">Categories: <strong>${categoryCount}</strong></div>
-    <div class="summary-pill">Model rows: <strong>${rowCount}</strong></div>
-    <div class="summary-pill">Units: <strong>${unitCount}</strong></div>
+    <div class="summary-pill">Models: <strong>${rowCount}</strong></div>
+    <div class="summary-pill">Total Items: <strong>${unitCount}</strong></div>
   `;
 }
 
@@ -191,10 +191,10 @@ function renderStocksResults() {
                 <table class="stock-table">
                   <thead>
                     <tr>
-                      <th style="width: 28%; text-align: left;">Product Model</th>
-                      <th style="width: 44%; text-align: left;">Color &amp; Location Stock Breakdown</th>
-                      <th style="width: 12%; text-align: center;">Total In-Stock</th>
-                      <th style="width: 16%; text-align: right;">Quick Actions</th>
+                      <th style="width: 28%; text-align: left;">Model</th>
+                      <th style="width: 44%; text-align: left;">Stock by Color &amp; Place</th>
+                      <th style="width: 12%; text-align: center;">Total Stock</th>
+                      <th style="width: 16%; text-align: right;">Actions</th>
                     </tr>
                   </thead>
                   <tbody>

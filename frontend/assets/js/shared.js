@@ -10,17 +10,7 @@ const TOP_COMPANIES = [
   'Super Flame', 'United', 'Westpoint'
 ];
 
-// Inject modern-erp.css globally across all pages
-(function injectModernStylesheet() {
-  if (typeof document === 'undefined') return;
-  if (!document.getElementById('malik-modern-erp-css')) {
-    const link = document.createElement('link');
-    link.id = 'malik-modern-erp-css';
-    link.rel = 'stylesheet';
-    link.href = '/static/css/modern-erp.css?v=20261111-v33';
-    document.head.appendChild(link);
-  }
-})();
+
 
 // Client-provided company logo mapping (checks API resolver + static folders)
 const CLIENT_COMPANY_LOGOS = {
@@ -379,6 +369,24 @@ const UI = {
     }
   },
 
+  formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    try {
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return String(dateStr);
+      return d.toLocaleString('en-PK', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (_) {
+      return String(dateStr);
+    }
+  },
+
   setToday(inputId) {
     const el = document.getElementById(inputId);
     if (!el) return;
@@ -568,13 +576,13 @@ function companyLogoHTML(companyName, sizeClass = '', imagePath = '') {
 
   if (primarySrc) {
     return `
-      <div class="company-logo-box ${escapeHtml(sizeClass)}" data-company-logo="${escapeHtml(companyName)}">
-        <img src="${escapeHtml(primarySrc)}" alt="${escapeHtml(companyName)}"
-             onerror="if(this.src && !this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.style.display='none';this.parentElement.textContent='${escapeHtml(initials)}';}">
+      <div class="company-logo ${escapeHtml(sizeClass)}" data-company-logo="${escapeHtml(companyName)}">
+        <img class="company-logo-image" src="${escapeHtml(primarySrc)}" alt="${escapeHtml(companyName)}"
+             onerror="if(this.src && !this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span class=\\'company-logo-fallback\\'>${escapeHtml(initials)}</span>';}">
       </div>
     `;
   }
-  return `<div class="company-logo-box ${escapeHtml(sizeClass)}" data-company-logo="${escapeHtml(companyName)}">${escapeHtml(initials)}</div>`;
+  return `<div class="company-logo ${escapeHtml(sizeClass)}" data-company-logo="${escapeHtml(companyName)}"><span class="company-logo-fallback">${escapeHtml(initials)}</span></div>`;
 }
 
 function hydrateCompanyLogos(root = document) {
@@ -587,7 +595,7 @@ function hydrateCompanyLogos(root = document) {
     const apiFallback = `/api/assets/company-logo/${encodeURIComponent(name.trim().toLowerCase())}`;
     if (resolved) {
       const initials = name.trim().slice(0, 2).toUpperCase();
-      box.innerHTML = `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(name)}" onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.style.display='none';this.parentElement.textContent='${escapeHtml(initials)}';}">`;
+      box.innerHTML = `<img class="company-logo-image" src="${escapeHtml(resolved)}" alt="${escapeHtml(name)}" onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span class=\\'company-logo-fallback\\'>${escapeHtml(initials)}</span>';}">`;
     }
   });
 }
@@ -600,13 +608,13 @@ function categoryVisualHTML(category) {
 
   if (resolved) {
     return `
-      <div class="category-visual-box" data-category-visual="${escapeHtml(title)}">
-        <img src="${escapeHtml(resolved)}" alt="${escapeHtml(title)}"
-             onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span>${escapeHtml(fallbackIcon)}</span>';}">
+      <div class="category-media" data-category-visual="${escapeHtml(title)}">
+        <img class="category-media-image" src="${escapeHtml(resolved)}" alt="${escapeHtml(title)}"
+             onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span class=\\'category-icon\\'>${escapeHtml(fallbackIcon)}</span>';}">
       </div>
     `;
   }
-  return `<div class="category-visual-box" data-category-visual="${escapeHtml(title)}"><span>${escapeHtml(fallbackIcon)}</span></div>`;
+  return `<div class="category-media" data-category-visual="${escapeHtml(title)}"><span class="category-icon">${escapeHtml(fallbackIcon)}</span></div>`;
 }
 
 function hydrateCategoryVisuals(root = document) {
@@ -618,7 +626,7 @@ function hydrateCategoryVisuals(root = document) {
     const resolved = resolveCategoryImagePath({ name });
     const apiFallback = `/api/assets/category-image/${encodeURIComponent(name.trim().toLowerCase())}`;
     if (resolved) {
-      box.innerHTML = `<img src="${escapeHtml(resolved)}" alt="${escapeHtml(name)}" onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span>📦</span>';}">`;
+      box.innerHTML = `<img class="category-media-image" src="${escapeHtml(resolved)}" alt="${escapeHtml(name)}" onerror="if(!this.dataset.triedApi){this.dataset.triedApi='1';this.src='${escapeHtml(apiFallback)}';}else{this.outerHTML='<span class=\\'category-icon\\'>📦</span>';}">`;
     }
   });
 }
@@ -765,12 +773,27 @@ function setupSidebarAndHeader(appState) {
   const path = window.location.pathname;
   const navLinks = [
     ['/dashboard', 'Dashboard'],
-    ['/inventory', 'Categories & Locations'],
-    ['/stocks', 'Stock Inventory'],
-    ['/sales', 'Sales & POS Billing'],
+    ['/inventory', 'Categories'],
+    ['/stocks', 'Stocks'],
+    ['/sales', 'Sales'],
     ['/purchases', 'Purchases'],
-    ['/accounts', 'Financial Accounts']
+    ['/accounts', 'Accounts']
   ];
+
+  const simpleHeadings = {
+    '/dashboard': ['Dashboard', 'Click any company or category to check stock and prices.'],
+    '/inventory': ['Categories & Places', 'Add or edit product categories and shop/godam places.'],
+    '/stocks': ['Stocks', 'Check available items by company, color, and place.'],
+    '/sales': ['Sales', 'Create customer bill, print on 1 page, or share on WhatsApp.'],
+    '/purchases': ['Purchases', 'Add new stock received from company or supplier.'],
+    '/accounts': ['Accounts', 'Check daily sales, purchases, profit, and bills.']
+  };
+  if (simpleHeadings[path]) {
+    const titleEl = document.querySelector('.page-title');
+    const subEl = document.querySelector('.page-subtitle');
+    if (titleEl) titleEl.textContent = simpleHeadings[path][0];
+    if (subEl) subEl.textContent = simpleHeadings[path][1];
+  }
 
   const navList = document.querySelector('.sidebar .nav-list');
   if (navList) {

@@ -254,30 +254,30 @@
   min-width: 840px;
 }
 
-/* Strict Column Widths (Preserves room for Action buttons) */
-.stock-table th:nth-child(1),
-.stock-table td:nth-child(1) {
+/* Strict Column Widths for 4-column stock table (leaves 7-column Branch Transfers table auto-sized) */
+#stocks-results .stock-table th:nth-child(1),
+#stocks-results .stock-table td:nth-child(1) {
   width: auto;
-  min-width: 280px;
+  min-width: 260px;
   text-align: left;
 }
-
-.stock-table th:nth-child(2),
-.stock-table td:nth-child(2) {
+#stocks-results .stock-table th:nth-child(2),
+#stocks-results .stock-table td:nth-child(2) {
   width: 110px;
   text-align: center;
 }
-
-.stock-table th:nth-child(3),
-.stock-table td:nth-child(3) {
+#stocks-results .stock-table th:nth-child(3),
+#stocks-results .stock-table td:nth-child(3) {
   width: 140px;
   text-align: center;
 }
-
-.stock-table th:nth-child(4),
-.stock-table td:nth-child(4) {
-  width: 240px; /* Ample space to prevent congestion */
+#stocks-results .stock-table th:nth-child(4),
+#stocks-results .stock-table td:nth-child(4) {
+  width: 230px;
   text-align: right;
+}
+#branch-transfers-section .stock-table {
+  table-layout: auto;
 }
 
 .stock-table th,

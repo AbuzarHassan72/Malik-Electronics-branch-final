@@ -1,4 +1,6 @@
 
+.sales-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(340px,0.95fr);gap:20px;align-items:start;}
+@media (max-width: 1120px){.sales-grid{grid-template-columns:1fr;}}
 .sales-builder-header{align-items:flex-start;gap:12px;}
 .line-items{display:grid;gap:16px;}
 .line-item-card{display:grid;gap:14px;padding:18px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(180deg,#fff,#fafbff);box-shadow:var(--shadow-soft);transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;}

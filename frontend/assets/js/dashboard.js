@@ -102,10 +102,10 @@ function renderDashboardStats() {
   const totalModels = companies.reduce((acc, c) => acc + Number(c.catalog_models || 0), 0);
 
   const cards = [
-    ['Categories', stats.total_categories || 0, 'Active product category groups'],
-    ['Stock Units', totalUnits, 'Physical units available in branch'],
-    ['Master Models', totalModels, 'Registered company models'],
-    ['Companies', companies.length, 'Active brands in this branch'],
+    ['Categories', stats.total_categories || 0, 'Product types in shop'],
+    ['Total Stock', totalUnits, 'Items available in branch'],
+    ['Models', totalModels, 'Total models in system'],
+    ['Companies', companies.length, 'Brands in this branch'],
   ];
 
   document.getElementById('dashboard-stats').innerHTML = cards.map(([label, value, note]) => `

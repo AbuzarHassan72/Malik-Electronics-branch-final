@@ -67,13 +67,13 @@ function renderSummary() {
   const summaryWrap = document.getElementById('category-summary');
   if (summaryWrap) {
     const cards = [
-      ['Master models', detail.summary?.master_models || 0, false],
-      ['In stock', detail.summary?.in_stock_models || 0, false],
-      ['Out of stock', detail.summary?.out_of_stock_models || 0, false],
-      ['Available units', detail.summary?.available_units || 0, false],
-      ['Purchase value', detail.summary?.purchase_value || 0, true],
-      ['Sales value', detail.summary?.sales_value || 0, true],
-      ['Stock value', detail.summary?.stock_value || 0, true],
+      ['Total Models', detail.summary?.master_models || 0, false],
+      ['In Stock', detail.summary?.in_stock_models || 0, false],
+      ['Out of Stock', detail.summary?.out_of_stock_models || 0, false],
+      ['Total Items', detail.summary?.available_units || 0, false],
+      ['Purchase Total', detail.summary?.purchase_value || 0, true],
+      ['Sales Total', detail.summary?.sales_value || 0, true],
+      ['Stock Value', detail.summary?.stock_value || 0, true],
     ];
 
     summaryWrap.innerHTML = cards.map(([label, value, money]) => `
@@ -260,22 +260,22 @@ function renderCompanySections() {
             <!-- EXECUTIVE METRIC ROW (Crystal Clear Labels) -->
             <div class="executive-metric-grid">
               <div class="exec-metric-card">
-                <span class="exec-metric-label">Tracked Colors</span>
+                <span class="exec-metric-label">Colors</span>
                 <span class="exec-metric-val">${colorCount} Color${colorCount === 1 ? '' : 's'}</span>
               </div>
               <div class="exec-metric-card">
-                <span class="exec-metric-label">Storage Locations</span>
+                <span class="exec-metric-label">Places</span>
                 <span class="exec-metric-val">${locationCount} Place${locationCount === 1 ? '' : 's'}</span>
               </div>
               <div class="exec-metric-card price-safe-box">
-                <span class="exec-metric-label">Stock Valuation</span>
+                <span class="exec-metric-label">Stock Value</span>
                 <span class="exec-metric-val currency-inline" style="color: #1d4ed8;">${UI.currencyHTML(model.stock_value)}</span>
               </div>
             </div>
 
             <!-- STRUCTURED COLOR & LOCATION BREAKDOWN -->
             <div class="exec-breakdown-box">
-              <div class="exec-breakdown-heading">Color &amp; Location Distribution</div>
+              <div class="exec-breakdown-heading">Stock by Color &amp; Place</div>
               ${renderColorLocationHierarchy(model)}
             </div>
 

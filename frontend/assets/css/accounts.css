@@ -1,33 +1,41 @@
 .access-panel {
   align-self: start;
 }
-
 .access-panel .form-stack {
   gap: 14px;
 }
-
 .access-panel .field input {
   min-height: 48px;
 }
-
 #account-stats .stat-card {
-  min-height: 156px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  min-height: 148px;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
 }
-
 #account-stats .stat-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
 }
-
 #recent-invoices .table-row,
 #recent-activity .record-card {
   border-radius: 18px;
 }
-
 #recent-invoices .price-safe-box,
 #account-stats .price-safe-box {
   display: inline-flex;
   align-items: baseline;
   gap: 6px;
   flex-wrap: wrap;
+}
+#period-presets-strip .chip.active {
+  background: var(--blue-dark);
+  color: #ffffff;
+  border-color: var(--blue-dark);
+  box-shadow: 0 4px 12px rgba(20, 40, 160, 0.22);
+}
+@media (max-width: 768px) {
+  #accounts-filter-form {
+    grid-template-columns: 1fr !important;
+  }
+  #accounts-filter-form .field {
+    min-width: 0 !important;
+  }
 }

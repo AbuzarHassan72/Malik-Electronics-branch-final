@@ -473,7 +473,7 @@ function clearLineItem(row) {
   const priceInput = row.querySelector('[data-item-field="unit_price"]');
   const totalEl = row.querySelector('[data-line-total]');
   const purEl = row.querySelector('[data-purchase-price]');
-  const tagsEl = row.querySelector('[data-item-tags"]');
+  const tagsEl = row.querySelector('[data-item-tags]');
 
   if (select) select.value = '';
   if (qtyInput) qtyInput.value = 1;
