@@ -282,18 +282,6 @@ _PG_POOL: Any = None
 _CONN_LAST_USED: dict[int, float] = {}
 
 
-def _open_fresh_pg_conn():
-    return psycopg2.connect(
-        POSTGRES_DSN,
-        connect_timeout=5,
-        keepalives=1,
-        keepalives_idle=15,
-        keepalives_interval=5,
-        keepalives_count=3,
-        options="-c statement_timeout=15000",
-    )
-
-
 def _get_pg_pool():
     global _PG_POOL
     if psycopg2 is None:
@@ -308,7 +296,6 @@ def _get_pg_pool():
             keepalives_idle=15,
             keepalives_interval=5,
             keepalives_count=3,
-            options="-c statement_timeout=15000",
         )
     return _PG_POOL
 
@@ -321,13 +308,14 @@ def get_connection():
         now = time.time()
         last_used = _CONN_LAST_USED.get(conn_id, 0.0)
 
-        # If connection was idle > 10s (e.g. Vercel serverless container freeze), replace immediately so it never hangs
+        # If connection was idle > 10s, discard it and get a fresh pooled connection
         if getattr(conn, "closed", 0) != 0 or (last_used > 0 and (now - last_used) > 10.0):
+            _CONN_LAST_USED.pop(conn_id, None)
             try:
                 pool.putconn(conn, close=True)
             except Exception:
                 pass
-            conn = _open_fresh_pg_conn()
+            conn = pool.getconn()
             conn_id = id(conn)
 
         _CONN_LAST_USED[conn_id] = now
@@ -364,7 +352,7 @@ def get_db_cursor(commit: bool = False):
                 pool.putconn(conn, close=True)
             except Exception:
                 pass
-            conn = _open_fresh_pg_conn()
+            conn = pool.getconn()
             _CONN_LAST_USED[id(conn)] = time.time()
             raw_cur = conn.cursor()
             wrapped_cur = PostgresCursorWrapper(raw_cur)
