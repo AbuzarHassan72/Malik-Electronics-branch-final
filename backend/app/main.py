@@ -140,9 +140,7 @@ class NoCacheStaticFiles(StaticFiles):
     async def get_response(self, path: str, scope):
         response = await super().get_response(path, scope)
         if response.status_code < 400:
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-            response.headers["Pragma"] = "no-cache"
-            response.headers["Expires"] = "0"
+            response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
         return response
 
 
@@ -350,16 +348,11 @@ def startup_event():
 async def disable_browser_cache(request: Request, call_next):
     response = await call_next(request)
     path = request.url.path
-    if request.method in {"GET", "HEAD"} and (
-        path.startswith("/static/")
-        or path.startswith("/media/")
-        or path.startswith("/api/")
-        or path in {"/", "/login", "/dashboard", "/inventory", "/sales", "/purchases", "/accounts", "/history", "/stocks"}
-        or path.startswith("/category/")
-    ):
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
+    if request.method in {"GET", "HEAD"}:
+        if path.startswith("/static/") or path.startswith("/media/") or path.startswith("/api/assets/"):
+            response.headers["Cache-Control"] = "public, max-age=3600, stale-while-revalidate=86400"
+        elif path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     return response
 
 

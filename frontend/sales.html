@@ -468,22 +468,27 @@
         </div>
       </header>
 
-      <!-- LIVE REVENUE KPIs -->
-      <div class="grid-3 stagger-1" style="margin-bottom: 20px;">
-        <article class="card stat-card price-safe-box" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: rgba(21, 128, 61, 0.15);">
-          <div class="stat-label">Today's Revenue</div>
+      <!-- LIVE REVENUE KPIs (Clickable to Filter Saved Invoices) -->
+      <div class="grid-4 stagger-1" style="margin-bottom: 20px;">
+        <article class="card stat-card price-safe-box" data-kpi-period="today" style="cursor: pointer; background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border-color: rgba(21, 128, 61, 0.2);">
+          <div class="stat-label">Today's Sales</div>
           <div class="stat-value currency" id="kpi-today" style="color: var(--green);">Rs 0</div>
-          <div class="stat-note">Sales processed today</div>
+          <div class="stat-note" id="kpi-today-note">0 bills today</div>
         </article>
-        <article class="card stat-card price-safe-box">
+        <article class="card stat-card price-safe-box" data-kpi-period="week" style="cursor: pointer;">
           <div class="stat-label">Last 7 Days</div>
           <div class="stat-value currency" id="kpi-week">Rs 0</div>
-          <div class="stat-note">Rolling 7-day revenue</div>
+          <div class="stat-note" id="kpi-week-note">0 bills in last 7 days</div>
         </article>
-        <article class="card stat-card price-safe-box">
+        <article class="card stat-card price-safe-box" data-kpi-period="month" style="cursor: pointer;">
           <div class="stat-label">This Month</div>
           <div class="stat-value currency" id="kpi-month">Rs 0</div>
-          <div class="stat-note">Rolling 30-day revenue</div>
+          <div class="stat-note" id="kpi-month-note">0 bills this month</div>
+        </article>
+        <article class="card stat-card price-safe-box" data-kpi-period="all" style="cursor: pointer; background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border-color: rgba(37, 99, 235, 0.2);">
+          <div class="stat-label">All-Time Sales</div>
+          <div class="stat-value currency" id="kpi-all" style="color: var(--blue-dark);">Rs 0</div>
+          <div class="stat-note" id="kpi-all-note">0 total bills</div>
         </article>
       </div>
 
@@ -562,10 +567,12 @@
         <div style="display: grid; gap: 18px; align-content: start;">
           <section class="card">
             <div class="section-title-row" style="flex-wrap: wrap; gap: 8px;">
-              <h2 class="section-title">Saved Invoices</h2>
+              <h2 class="section-title">Saved Bills</h2>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 <button type="button" id="btn-today-sales" class="btn-ghost small active" style="font-weight: 800; border-color: var(--blue);">Today</button>
-                <button type="button" id="btn-show-all-sales" class="btn-ghost small">All History</button>
+                <button type="button" id="btn-week-sales" class="btn-ghost small">Last 7 Days</button>
+                <button type="button" id="btn-month-sales" class="btn-ghost small">This Month</button>
+                <button type="button" id="btn-show-all-sales" class="btn-ghost small">All Time</button>
                 <button type="button" id="btn-refresh-history" class="btn-ghost small">Refresh</button>
               </div>
             </div>

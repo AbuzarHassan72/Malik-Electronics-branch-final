@@ -27,11 +27,11 @@
 }
 
 * { box-sizing: border-box; }
-html, body { min-height: 100%; }
+html, body { min-height: 100%; background: #f3f6fb; }
 body {
   margin: 0;
   font-family: 'SamsungOne', 'Plus Jakarta Sans', Inter, 'Noto Nastaliq Urdu', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background: #0d131f;
+  background: #f3f6fb;
   color: var(--text);
   overflow-x: clip;
   position: relative;
@@ -1965,6 +1965,12 @@ body.prices-hidden [data-sensitive="price"]::after {
   z-index: 1900;
 }
 
+/* Restore Dark Animated Background on Login Page */
+body.login-page::before,
+body.login-page::after {
+  display: none !important;
+}
+
 @media (max-width: 960px) {
   .mobile-topbar {
     display: flex;
@@ -1991,14 +1997,219 @@ body.prices-hidden [data-sensitive="price"]::after {
     display: block;
   }
 
+  .main-area {
+    padding: 14px 12px 28px !important;
+    gap: 14px !important;
+  }
+
+  /* 1. Page Header & Single-Line Branch + Unlock Prices Row */
+  .page-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    background: #ffffff;
+    padding: 14px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .page-title {
+    font-size: 1.35rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .page-subtitle {
+    font-size: 0.84rem !important;
+    margin-top: 4px !important;
+  }
+
   #global-header-controls {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr auto;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    gap: 8px !important;
+    align-items: center !important;
   }
 
   #global-branch-switcher {
     width: 100% !important;
-    min-width: 0;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    padding: 6px 12px !important;
+    font-size: 0.84rem !important;
+  }
+
+  #global-price-lock-btn {
+    min-height: 42px !important;
+    padding: 8px 14px !important;
+    font-size: 0.84rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* 2. Category Hero Banner & 2-Column KPI Summary Grid (Screenshot 1 Fix) */
+  .hero-banner {
+    padding: 16px !important;
+    border-radius: 20px !important;
+    gap: 14px !important;
+  }
+
+  .hero-banner .section-banner {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .hero-banner .inline-actions {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .hero-banner .inline-actions > *:first-child {
+    grid-column: 1 / -1 !important;
+  }
+
+  .hero-banner .inline-actions .btn,
+  .hero-banner .inline-actions .btn-accent,
+  .hero-banner .inline-actions .btn-ghost {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 11px 14px !important;
+    font-size: 0.88rem !important;
+  }
+
+  #category-summary,
+  #dashboard-stats,
+  #account-stats {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  #category-summary .kpi-box:last-child:nth-child(odd) {
+    grid-column: 1 / -1 !important;
+  }
+
+  .kpi-box,
+  .stat-card {
+    padding: 12px 14px !important;
+    min-height: auto !important;
+    border-radius: 16px !important;
+  }
+
+  .kpi-box .value,
+  .stat-value {
+    font-size: 1.35rem !important;
+  }
+
+  /* 3. Category Filter Form & 2x2 Summary Pills (Screenshot 3 Fix) */
+  .single-line-filters {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    align-items: end !important;
+  }
+
+  .single-line-filters .compact-field {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex: none !important;
+  }
+
+  .single-line-filters .compact-field.grow-2 {
+    grid-column: 1 / -1 !important;
+  }
+
+  .single-line-filters .actions-field label {
+    display: none !important;
+  }
+
+  .single-line-filters .actions-field button {
+    width: 100% !important;
+    min-height: 44px !important;
+  }
+
+  .browser-summary-strip {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin-top: 14px !important;
+  }
+
+  .browser-summary-strip .summary-pill {
+    padding: 8px 12px !important;
+    font-size: 0.8rem !important;
+    text-align: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+  }
+
+  /* 4. Manage Stock Modal & Section Header Clipping Fix (Screenshot 2 Fix) */
+  .modal-backdrop {
+    padding: 10px !important;
+  }
+
+  .modal {
+    padding: 16px !important;
+    border-radius: 20px !important;
+    max-height: 92vh !important;
+  }
+
+  .modal-header {
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .modal-header h2,
+  .modal-header h3,
+  #stock-modal-title {
+    font-size: 1.05rem !important;
+    line-height: 1.3 !important;
+    font-weight: 800 !important;
+    word-break: break-word !important;
+  }
+
+  .modal .section-title-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .modal .section-title-row h3 {
+    margin: 0 !important;
+    font-size: 0.96rem !important;
+  }
+
+  .modal .section-title-row button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* 5. Login Page Mobile Buttons (Screenshot 4 Fix) */
+  .login-card {
+    padding: 20px 18px !important;
+    border-radius: 22px !important;
+  }
+
+  .login-title {
+    font-size: 1.75rem !important;
+  }
+
+  .login-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .login-actions button {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 48px !important;
   }
 }

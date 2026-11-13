@@ -197,10 +197,11 @@ function filteredProducts() {
 
 function productOptionLabel(item) {
   const stock = Number(item.current_stock || 0);
-  const stockLabel = stock > 0 ? `${stock} available` : 'No Available Stock';
-  const cat = item.category_name ? `[${item.category_name}] ` : '';
-  const loc = item.location_name ? ` | Loc: ${item.location_name}` : '';
-  return `${cat}${item.company || '-'} ${item.model} - Color: ${item.color || 'Standard'}${loc} (${stockLabel})`;
+  const stockLabel = stock > 0 ? `${stock} in stock` : 'Out of Stock';
+  const series = item.series ? ` (${item.series})` : '';
+  const cat = item.category_name ? ` • ${item.category_name}` : '';
+  const loc = item.location_name ? ` • Place: ${item.location_name}` : '';
+  return `${item.model}${series} — ${item.company || '-'}${cat} • Color: ${item.color || 'Standard'}${loc} [${stockLabel}]`;
 }
 
 function hydrateModelFilter() {
@@ -250,55 +251,86 @@ async function fetchProducts() {
 }
 
 // ==========================================
-// 2. INVOICE LINE ITEMS
+// 2. INVOICE LINE ITEMS (Full Product Details Display)
 // ==========================================
-function productQuickFacts(product, currentQty = 1) {
-  if (!product) return '<span class="badge danger" style="padding:4px 8px; font-size:0.75rem;">No product selected</span>';
+function productQuickFacts(product, currentQty = 1, currentSalePrice = 0) {
+  if (!product) {
+    return '<div style="padding: 8px 12px; background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; border-radius: 10px; font-size: 0.82rem; font-weight: 700;">No product selected yet. Choose a product from the dropdown or search box above.</div>';
+  }
   const stock = Number(product.current_stock || 0);
   const afterStock = stock - currentQty;
-  return [
-    `<span class="badge" style="padding:4px 8px; font-size:0.75rem; background:#dbeafe; color:#1e40af; font-weight:800;">${escapeHtml(product.category_name || 'Appliance')}</span>`,
-    `<span class="badge info" style="padding:4px 8px; font-size:0.75rem;">${escapeHtml(product.company || 'Brand')}</span>`,
-    `<span class="badge" style="padding:4px 8px; font-size:0.75rem; background:#f1f5f9; color:#334155; border:1px solid #cbd5e1;">Color: ${escapeHtml(product.color || 'Standard')}</span>`,
-    `<span class="badge" style="padding:4px 8px; font-size:0.75rem; background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe;">Location: ${escapeHtml(product.location_name || 'Warehouse')}</span>`,
-    `<span class="badge ${stock > 0 ? 'success' : 'danger'}" style="padding:4px 8px; font-size:0.75rem;">Stock: ${stock}</span>`,
-    `<span class="badge ${afterStock >= 0 ? 'warning' : 'danger'}" style="padding:4px 8px; font-size:0.75rem; ${afterStock >= 0 ? 'background: #fef3c7; color: #b45309;' : ''}">After Sale: ${afterStock}</span>`
-  ].join('');
+  const purPrice = Number(
+    product.default_purchase_price ||
+    product.last_purchase_price ||
+    product.average_unit_cost ||
+    0
+  );
+  const estProfit = (Number(currentSalePrice || 0) - purPrice) * Number(currentQty || 1);
+
+  return `
+    <div style="width: 100%; background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 14px; display: grid; gap: 8px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 6px;">
+        <div style="font-size: 0.96rem; font-weight: 900; color: #0f172a;">
+          Model: <span style="color: var(--blue-dark);">${escapeHtml(product.model)}</span>
+          ${product.series ? `<span style="font-weight: 700; color: #475569;"> (${escapeHtml(product.series)})</span>` : ''}
+          ${product.size ? `<span style="font-weight: 700; color: #0369a1;"> • ${escapeHtml(product.size)}</span>` : ''}
+        </div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <span class="badge" style="padding: 4px 10px; font-size: 0.76rem; background: #dbeafe; color: #1e40af; font-weight: 800;">Category: ${escapeHtml(product.category_name || 'Appliance')}</span>
+          <span class="badge info" style="padding: 4px 10px; font-size: 0.76rem;">Brand: ${escapeHtml(product.company || '-')}</span>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 0.8rem;">
+        <span class="badge" style="padding: 4px 10px; font-size: 0.76rem; background: #f1f5f9; color: #0f172a; border: 1px solid #cbd5e1;">Color: <strong>${escapeHtml(product.color || 'Standard')}</strong></span>
+        <span class="badge" style="padding: 4px 10px; font-size: 0.76rem; background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">Place: <strong>${escapeHtml(product.location_name || 'Warehouse')}</strong></span>
+        <span class="badge ${stock > 0 ? 'success' : 'danger'}" style="padding: 4px 10px; font-size: 0.76rem;">Available Stock: <strong>${stock}</strong></span>
+        <span class="badge ${afterStock >= 0 ? 'warning' : 'danger'}" style="padding: 4px 10px; font-size: 0.76rem; ${afterStock >= 0 ? 'background: #fef3c7; color: #b45309;' : ''}">Stock After Sale: <strong>${afterStock}</strong></span>
+        <span class="badge price-safe-box" style="padding: 4px 10px; font-size: 0.76rem; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0;">Purchase Rate: <strong>${UI.currencyHTML(purPrice)}</strong></span>
+        <span class="badge price-safe-box" style="padding: 4px 10px; font-size: 0.76rem; background: ${estProfit >= 0 ? '#dcfce7' : '#fee2e2'}; color: ${estProfit >= 0 ? '#166534' : '#991b1b'};">Est. Profit: <strong>${UI.currencyHTML(estProfit)}</strong></span>
+      </div>
+    </div>
+  `;
 }
 
 function makeLineItemRow(stateItem) {
   return `
-    <div class="line-item-row" data-id="${stateItem.id}">
-      <div style="flex: 2; min-width: 210px;">
-        <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Product (Category • Brand • Model)</label>
-        <select class="item-product-select" data-item-field="product_id" style="width: 100%; border: 1px solid var(--line); font-weight: 700; background: #fff; padding: 12px; border-radius: 10px; margin-top: 4px;"></select>
-        <div class="line-item-tags" data-item-tags style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;"></div>
+    <div class="line-item-row" data-id="${stateItem.id}" style="display: grid; gap: 12px; padding: 16px; background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 16px; margin-bottom: 14px;">
+      <!-- Row 1: Full-Width Product Model Selector -->
+      <div style="width: 100%;">
+        <label style="font-size: 0.78rem; color: var(--blue-dark); text-transform: uppercase; font-weight: 800; letter-spacing: 0.04em; display: block; margin-bottom: 6px;">Select Product (Model — Brand — Category — Color — Place)</label>
+        <select class="item-product-select" data-item-field="product_id" style="width: 100%; border: 1.5px solid var(--line-strong); font-weight: 800; font-size: 0.95rem; background: #fff; padding: 12px 14px; border-radius: 12px; color: #0f172a;"></select>
       </div>
 
-      <div style="flex: 1; max-width: 130px;">
-        <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Qty</label>
-        <div class="input-stepper" style="margin-top: 4px;">
-          <button type="button" data-step-qty="-1" class="btn-ghost" style="border: none; border-radius: 0; padding: 10px 14px;">-</button>
-          <input type="number" data-item-field="quantity" value="${stateItem.qty || 1}" min="1">
-          <button type="button" data-step-qty="1" class="btn-ghost" style="border: none; border-radius: 0; padding: 10px 14px;">+</button>
+      <!-- Row 2: Qty, Unit Price, Line Total & Actions -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(135px, 1fr)); gap: 12px; align-items: end; background: #ffffff; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);">
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.04em;">Quantity</label>
+          <div class="input-stepper" style="margin-top: 4px; border: 1px solid var(--line-strong);">
+            <button type="button" data-step-qty="-1" class="btn-ghost" style="border: none; border-radius: 0; padding: 10px 14px;">-</button>
+            <input type="number" data-item-field="quantity" value="${stateItem.qty || 1}" min="1" style="min-height: 40px;">
+            <button type="button" data-step-qty="1" class="btn-ghost" style="border: none; border-radius: 0; padding: 10px 14px;">+</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.04em;">Sale Unit Price (Rs)</label>
+          <input type="number" data-item-field="unit_price" value="${stateItem.unitPrice || 0}" step="0.01" style="width: 100%; min-height: 42px; border: 1px solid var(--line-strong); padding: 10px 12px; border-radius: 10px; font-weight: 800; font-size: 1rem; background: #fff; margin-top: 4px;">
+          <div style="display:none;" data-purchase-price></div>
+        </div>
+
+        <div style="text-align: right; align-self: center;">
+          <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 800; letter-spacing: 0.04em; display: block;">Line Total</label>
+          <div data-line-total class="price-safe-box" style="font-size: 1.3rem; font-weight: 900; color: var(--blue-dark); margin-top: 4px;">Rs 0</div>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+          <button type="button" class="btn-ghost small btn-clear-row" style="padding: 9px 14px; font-size: 0.8rem;">Clear</button>
+          ${salesState.lineItems.length > 1 ? `<button type="button" class="btn-danger small btn-remove-row" style="padding: 9px 14px; font-size: 0.8rem;">Remove</button>` : ''}
         </div>
       </div>
 
-      <div style="flex: 1; max-width: 145px;">
-        <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Unit Price (Rs)</label>
-        <input type="number" data-item-field="unit_price" value="${stateItem.unitPrice || 0}" step="0.01" style="width: 100%; border: 1px solid var(--line); padding: 12px; border-radius: 10px; font-weight: 800; background: #fff; margin-top: 4px;">
-        <div style="margin-top: 6px; font-size: 0.8rem; color: var(--muted);" data-purchase-price></div>
-      </div>
-
-      <div style="flex: 1; max-width: 130px; text-align: right; align-self: center; padding-top: 18px;">
-        <label style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Line Total</label>
-        <div data-line-total class="price-safe-box" style="font-size: 1.2rem; font-weight: 900; color: var(--blue-dark); margin-top: 4px;">Rs 0</div>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 6px; justify-content: center; padding-top: 18px;">
-        <button type="button" class="btn-ghost small btn-clear-row" style="padding: 6px 10px; font-size: 0.75rem;">Clear</button>
-        ${salesState.lineItems.length > 1 ? `<button type="button" class="btn-danger small btn-remove-row" style="padding: 6px 10px; font-size: 0.75rem;">Drop</button>` : ''}
-      </div>
+      <!-- Row 3: Full Product Details Card (Model, Series, Category, Brand, Color, Place, Stock, Purchase Price & Profit) -->
+      <div class="line-item-tags" data-item-tags style="width: 100%;"></div>
     </div>
   `;
 }
@@ -345,26 +377,14 @@ function updateRowUI(row, stateItem) {
   if (totalEl) totalEl.innerHTML = UI.currencyHTML(stateItem.qty * stateItem.unitPrice);
 
   const tagsEl = row.querySelector('[data-item-tags]');
-  if (tagsEl) tagsEl.innerHTML = productQuickFacts(product, stateItem.qty);
-
-  const purEl = row.querySelector('[data-purchase-price]');
-  if (purEl) {
-    const purPrice = product ? (
-      product.default_purchase_price ||
-      product.last_purchase_price ||
-      product.purchase_price ||
-      product.cost_price ||
-      product.unit_cost ||
-      0
-    ) : 0;
-    purEl.innerHTML = product ? `<span class="price-safe-box">Pur: ${UI.currencyHTML(purPrice)}</span>` : '';
-  }
+  if (tagsEl) tagsEl.innerHTML = productQuickFacts(product, stateItem.qty, stateItem.unitPrice);
 
   if (product && stateItem.qty > Number(product.current_stock)) {
     row.classList.add('line-item-warning');
   } else {
     row.classList.remove('line-item-warning');
   }
+  if (typeof UI !== 'undefined' && typeof UI.applyPricePrivacy === 'function') UI.applyPricePrivacy();
 }
 
 function renderLineItems() {
@@ -625,7 +645,7 @@ function calculateInvoiceTotals() {
 }
 
 // ==========================================
-// 4. PROFESSIONAL INVOICE MODAL, PRINT & WHATSAPP SHARING
+// 4. PROFESSIONAL INVOICE MODAL, PRINT & WHATSAPP IMAGE SHARING
 // ==========================================
 function formatInvoiceDateTime(inv) {
   const raw = inv.transaction_at || inv.invoice_date || inv.created_at || '';
@@ -659,72 +679,357 @@ function buildWhatsAppReceiptText(inv) {
   const dateStr = formatInvoiceDateTime(inv);
   const rawItems = inv.items || [];
 
-  let lines = [
-    `*MALIK ELECTRONIC*`,
-    `Branch: ${branchName}`,
-    `--------------------------------`,
-    `*INVOICE:* ${invNo}`,
-    `*Date:* ${dateStr}`,
-    `*Customer:* ${customer}`,
-    inv.phone_number ? `*Phone:* ${inv.phone_number}` : null,
-    inv.address ? `*Address:* ${inv.address}` : null,
-    `*Payment Status:* ${status.toUpperCase()}`,
-    `--------------------------------`,
-    `*PURCHASED ITEMS:*`
-  ].filter(Boolean);
+  const lines = [
+    `*MALIK ELECTRONIC (${branchName})*`,
+    `Invoice: *${invNo}* | Date: ${dateStr}`,
+    `Customer: *${customer}* (${status})`,
+    `--------------------------------`
+  ];
 
   rawItems.forEach((item, idx) => {
     const d = resolveInvoiceItemDetails(item);
-    const specs = [d.seriesName, d.sizeName, d.colorName !== 'Standard' ? d.colorName : ''].filter(Boolean).join(' • ');
-    lines.push(
-      `${idx + 1}. *${d.categoryName.toUpperCase()}* - ${d.companyName} ${d.modelName}${specs ? ` (${specs})` : ''}`,
-      `   Qty: ${d.quantity} x ${formatUnmaskedPKR(d.unitPrice)} = *${formatUnmaskedPKR(d.lineTotal)}*`
-    );
+    lines.push(`${idx + 1}. *${d.categoryName}*: ${d.companyName} ${d.modelName} (${d.colorName}) x${d.quantity} = *${formatUnmaskedPKR(d.lineTotal)}*`);
   });
 
-  const subtotal = Number(inv.subtotal ?? inv.total_amount ?? 0);
-  const discount = Number(inv.discount_amount ?? 0);
-  const grandTotal = Number(inv.total_amount ?? 0);
-
   lines.push(`--------------------------------`);
-  if (discount > 0) {
-    lines.push(`Subtotal: ${formatUnmaskedPKR(subtotal)}`);
-    lines.push(`Discount: -${formatUnmaskedPKR(discount)}`);
-  }
-  lines.push(`*GRAND TOTAL: ${formatUnmaskedPKR(grandTotal)}*`);
-  if (inv.notes) {
-    lines.push(`*Notes:* ${inv.notes}`);
-  }
-  lines.push(`--------------------------------`);
+  lines.push(`*GRAND TOTAL: ${formatUnmaskedPKR(inv.total_amount)}*`);
   lines.push(`Thank you for shopping at Malik Electronic!`);
-
   return lines.join('\n');
 }
 
-function shareInvoiceOnWhatsApp(inv) {
+/**
+ * Renders a studio-quality 1200px PNG Image of the Invoice using native HTML5 Canvas.
+ * Works 100% offline/online on all Android, iOS, and Desktop browsers.
+ */
+async function generateInvoiceCanvasDataUrl(inv) {
+  const invNo = inv.invoice_number || `INV-${inv.id}`;
+  const branchName = inv.branch_name || currentBranchInfo.name || 'Talagang City';
+  const dateStr = formatInvoiceDateTime(inv);
+  const status = (inv.status || 'Paid').toUpperCase();
+  const isPaid = status === 'PAID';
+
+  const rawItems = inv.items || [];
+  const items = rawItems.map(item => resolveInvoiceItemDetails(item));
+  const totalUnits = items.reduce((acc, it) => acc + it.quantity, 0);
+  const subtotal = Number(inv.subtotal ?? items.reduce((acc, it) => acc + it.lineTotal, 0));
+  const discountAmount = Number(inv.discount_amount ?? 0);
+  const grandTotal = Number(inv.total_amount ?? Math.max(0, subtotal - discountAmount));
+
+  const width = 1100;
+  const rowHeight = 76;
+  const baseHeight = 640;
+  const height = baseHeight + Math.max(items.length, 1) * rowHeight;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+
+  const roundRect = (x, y, w, h, r, fill, stroke) => {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+    if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+    if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke(); }
+  };
+
+  // 1. White Sheet Background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, width, height);
+
+  // 2. Top Executive Navy Header Banner
+  const grad = ctx.createLinearGradient(0, 0, width, 155);
+  grad.addColorStop(0, '#070d19');
+  grad.addColorStop(1, '#1428a0');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, 155);
+
+  // Gold accent bar
+  ctx.fillStyle = '#facc15';
+  ctx.fillRect(0, 150, width, 6);
+
+  // Logo Box
+  roundRect(45, 32, 74, 74, 16, '#facc15', null);
+  ctx.fillStyle = '#070d19';
+  ctx.font = '900 32px Inter, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('ME', 82, 80);
+
+  // Brand Title
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 34px Inter, Arial, sans-serif';
+  ctx.fillText('MALIK ELECTRONIC', 138, 65);
+
+  ctx.fillStyle = '#cbd5e1';
+  ctx.font = '600 17px Inter, Arial, sans-serif';
+  ctx.fillText(`Branch: ${branchName}  •  Authorized Home Appliances & Electronics Dealer`, 138, 95);
+  ctx.fillStyle = '#93c5fd';
+  ctx.font = '600 15px Inter, Arial, sans-serif';
+  ctx.fillText('Refrigerators • Air Conditioners • Washing Machines • LED TVs • Kitchen Appliances', 138, 122);
+
+  // Right Invoice Meta in Banner
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#facc15';
+  ctx.font = '800 15px Inter, Arial, sans-serif';
+  ctx.fillText('CUSTOMER SALES INVOICE', width - 45, 48);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 28px Inter, Arial, sans-serif';
+  ctx.fillText(invNo, width - 45, 82);
+
+  ctx.fillStyle = '#e2e8f0';
+  ctx.font = '600 15px Inter, Arial, sans-serif';
+  ctx.fillText(`Date: ${dateStr}`, width - 45, 110);
+
+  // Status Badge
+  roundRect(width - 145, 118, 100, 24, 12, isPaid ? '#16a34a' : '#d97706', null);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 13px Inter, Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(status, width - 95, 135);
+
+  // 3. Customer & Transaction Cards
+  roundRect(45, 182, 500, 115, 14, '#f8fafc', '#cbd5e1');
+  roundRect(565, 182, 490, 115, 14, '#f8fafc', '#cbd5e1');
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#64748b';
+  ctx.font = '800 13px Inter, Arial, sans-serif';
+  ctx.fillText('BILL TO CUSTOMER', 65, 208);
+  ctx.fillText('PURCHASE & WARRANTY SUMMARY', 585, 208);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = '800 22px Inter, Arial, sans-serif';
+  ctx.fillText(String(inv.customer_name || 'Walk-in Customer').slice(0, 32), 65, 238);
+
+  ctx.fillStyle = '#334155';
+  ctx.font = '600 16px Inter, Arial, sans-serif';
+  ctx.fillText(`Phone / WhatsApp: ${inv.phone_number || 'N/A'}`, 65, 264);
+  ctx.fillText(`Address: ${String(inv.address || 'N/A').slice(0, 42)}`, 65, 286);
+
+  ctx.fillStyle = '#0f172a';
+  ctx.font = '700 16px Inter, Arial, sans-serif';
+  ctx.fillText(`Purchased Items: ${items.length} Product(s) (${totalUnits} Unit${totalUnits === 1 ? '' : 's'})`, 585, 238);
+  ctx.fillText(`Payment Status: ${status}`, 585, 264);
+  ctx.fillStyle = '#475569';
+  ctx.font = '600 15px Inter, Arial, sans-serif';
+  ctx.fillText(`Notes: ${String(inv.notes || 'Official Brand Warranty Applies').slice(0, 40)}`, 585, 286);
+
+  // 4. Table Header
+  const tableTop = 320;
+  roundRect(45, tableTop, width - 90, 46, 10, '#0f172a', null);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 14px Inter, Arial, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('#', 65, tableTop + 29);
+  ctx.fillText('PRODUCT CATEGORY', 105, tableTop + 29);
+  ctx.fillText('BRAND', 325, tableTop + 29);
+  ctx.fillText('MODEL & DETAILS', 470, tableTop + 29);
+  ctx.textAlign = 'center';
+  ctx.fillText('QTY', 755, tableTop + 29);
+  ctx.textAlign = 'right';
+  ctx.fillText('UNIT PRICE', 900, tableTop + 29);
+  ctx.fillText('TOTAL', width - 65, tableTop + 29);
+
+  // 5. Table Rows
+  let y = tableTop + 46;
+  items.forEach((it, idx) => {
+    if (idx % 2 === 1) {
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(45, y, width - 90, rowHeight);
+    }
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(45, y + rowHeight);
+    ctx.lineTo(width - 45, y + rowHeight);
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#64748b';
+    ctx.font = '800 16px Inter, Arial, sans-serif';
+    ctx.fillText(String(idx + 1), 65, y + 44);
+
+    // Category Badge
+    const catText = String(it.categoryName || 'Appliance').toUpperCase().slice(0, 18);
+    roundRect(105, y + 20, 200, 34, 8, '#dbeafe', '#bfdbfe');
+    ctx.fillStyle = '#1e40af';
+    ctx.font = '800 14px Inter, Arial, sans-serif';
+    ctx.fillText(catText, 118, y + 42);
+
+    // Brand
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '800 17px Inter, Arial, sans-serif';
+    ctx.fillText(String(it.companyName || '-').slice(0, 14), 325, y + 43);
+
+    // Model & Specs
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '800 18px Inter, Arial, sans-serif';
+    ctx.fillText(String(it.modelName || '-').slice(0, 22), 470, y + 34);
+
+    const specs = [
+      it.seriesName ? `${it.seriesName}` : '',
+      it.sizeName ? `${it.sizeName}` : '',
+      it.colorName ? `Color: ${it.colorName}` : ''
+    ].filter(Boolean).join(' • ');
+    ctx.fillStyle = '#64748b';
+    ctx.font = '600 14px Inter, Arial, sans-serif';
+    ctx.fillText(specs.slice(0, 34), 470, y + 56);
+
+    // Qty
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 18px Inter, Arial, sans-serif';
+    ctx.fillText(String(it.quantity), 755, y + 44);
+
+    // Unit Price
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#334155';
+    ctx.font = '700 16px Inter, Arial, sans-serif';
+    ctx.fillText(formatUnmaskedPKR(it.unitPrice), 900, y + 44);
+
+    // Line Total
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 18px Inter, Arial, sans-serif';
+    ctx.fillText(formatUnmaskedPKR(it.lineTotal), width - 65, y + 44);
+
+    y += rowHeight;
+  });
+
+  // 6. Totals & Warranty Footer
+  const footerTop = y + 26;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#0f172a';
+  ctx.font = '800 16px Inter, Arial, sans-serif';
+  ctx.fillText('Warranty & Return Policy:', 45, footerTop + 22);
+  ctx.fillStyle = '#475569';
+  ctx.font = '600 14px Inter, Arial, sans-serif';
+  ctx.fillText('• All appliances carry official company/brand warranty.', 45, footerTop + 46);
+  ctx.fillText('• Please keep this invoice safe for warranty claims.', 45, footerTop + 68);
+  ctx.fillText('• Thank you for shopping with Malik Electronic!', 45, footerTop + 90);
+
+  // Totals Card on Right
+  roundRect(660, footerTop, width - 705, 130, 14, '#f8fafc', '#cbd5e1');
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#475569';
+  ctx.font = '700 16px Inter, Arial, sans-serif';
+  ctx.fillText(`Subtotal (${totalUnits} items):`, 682, footerTop + 34);
+  ctx.fillText('Discount:', 682, footerTop + 64);
+
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#0f172a';
+  ctx.fillText(formatUnmaskedPKR(subtotal), width - 65, footerTop + 34);
+  ctx.fillStyle = discountAmount > 0 ? '#dc2626' : '#64748b';
+  ctx.fillText(discountAmount > 0 ? `- ${formatUnmaskedPKR(discountAmount)}` : 'Rs 0', width - 65, footerTop + 64);
+
+  // Grand Total Bar
+  roundRect(672, footerTop + 78, width - 729, 42, 10, '#1428a0', null);
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '900 18px Inter, Arial, sans-serif';
+  ctx.fillText('GRAND TOTAL:', 690, footerTop + 105);
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#facc15';
+  ctx.font = '900 21px Inter, Arial, sans-serif';
+  ctx.fillText(formatUnmaskedPKR(grandTotal), width - 78, footerTop + 106);
+
+  // Signatures
+  const sigY = footerTop + 185;
+  ctx.strokeStyle = '#94a3b8';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(45, sigY);
+  ctx.lineTo(300, sigY);
+  ctx.moveTo(width - 320, sigY);
+  ctx.lineTo(width - 45, sigY);
+  ctx.stroke();
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#64748b';
+  ctx.font = '700 14px Inter, Arial, sans-serif';
+  ctx.fillText('Customer Signature', 45, sigY + 22);
+  ctx.textAlign = 'right';
+  ctx.fillText('Authorized Signature (Malik Electronic)', width - 45, sigY + 22);
+
+  return canvas.toDataURL('image/png');
+}
+
+async function dataUrlToFile(dataUrl, fileName) {
+  const res = await fetch(dataUrl);
+  const blob = await res.blob();
+  return new File([blob], fileName, { type: 'image/png' });
+}
+
+/**
+ * Shares the actual Invoice PNG Image via native mobile share sheet (supports BOTH Normal WhatsApp
+ * and WhatsApp Business!) or downloads the PNG image and opens WhatsApp on desktop.
+ */
+async function shareInvoiceOnWhatsApp(inv) {
   if (!inv) return;
-  const text = buildWhatsAppReceiptText(inv);
-  let phone = String(inv.phone_number || '').replace(/[^0-9]/g, '');
+  const invNo = inv.invoice_number || `INV-${inv.id}`;
+  const fileName = `${invNo}.png`;
 
-  // Convert local Pakistani 03XXxxxxxxx format to international 923XXxxxxxxx
-  if (phone.startsWith('03') && phone.length === 11) {
-    phone = '92' + phone.slice(1);
-  } else if (phone.startsWith('3') && phone.length === 10) {
-    phone = '92' + phone;
-  } else if (phone.startsWith('0092')) {
-    phone = phone.slice(2);
+  try {
+    UI.toast('Preparing Invoice Image for WhatsApp...', 'info');
+    const dataUrl = await generateInvoiceCanvasDataUrl(inv);
+    const imageFile = await dataUrlToFile(dataUrl, fileName);
+    const caption = buildWhatsAppReceiptText(inv);
+
+    // 1. Mobile Native File Share (Lets user pick Normal WhatsApp OR WhatsApp Business with the PNG Image attached!)
+    if (navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+      await navigator.share({
+        files: [imageFile],
+        title: `Malik Electronic - ${invNo}`,
+        text: caption
+      });
+      return;
+    }
+
+    // 2. Desktop / Fallback: Download the PNG Image automatically & open WhatsApp chat
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    let phone = String(inv.phone_number || '').replace(/[^0-9]/g, '');
+    if (phone.startsWith('03') && phone.length === 11) phone = '92' + phone.slice(1);
+    else if (phone.startsWith('3') && phone.length === 10) phone = '92' + phone;
+    else if (phone.startsWith('0092')) phone = phone.slice(2);
+
+    const encodedText = encodeURIComponent(caption);
+    const waUrl = phone.length >= 11
+      ? `https://api.whatsapp.com/send?phone=${phone}&text=${encodedText}`
+      : `https://api.whatsapp.com/send?text=${encodedText}`;
+
+    UI.toast('Invoice image downloaded! Attach it in WhatsApp.', 'success');
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  } catch (err) {
+    if (err && err.name === 'AbortError') return; // User closed share sheet
+    UI.toast('Could not share invoice image.', 'error');
   }
+}
 
-  const encodedText = encodeURIComponent(text);
-  const waUrl = phone.length >= 11
-    ? `https://wa.me/${phone}?text=${encodedText}`
-    : `https://wa.me/?text=${encodedText}`;
-
-  window.open(waUrl, '_blank', 'noopener,noreferrer');
+async function downloadInvoiceImage(inv) {
+  if (!inv) return;
+  const invNo = inv.invoice_number || `INV-${inv.id}`;
+  const dataUrl = await generateInvoiceCanvasDataUrl(inv);
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = `${invNo}.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  UI.toast('Invoice image saved!', 'success');
 }
 
 function triggerSinglePagePrint() {
-  // Ensure any background modals are closed so only #invoice-detail-modal prints
   ['discount-rule-modal', 'security-reverse-modal', 'price-unlock-modal'].forEach(id => {
     document.getElementById(id)?.classList.remove('open');
   });
@@ -752,29 +1057,40 @@ async function openInvoiceDetailModal(invoiceId) {
     const grandTotal = Number(inv.total_amount ?? Math.max(0, subtotal - discountAmount));
 
     const titleEl = document.getElementById('invoice-detail-title');
-    if (titleEl) titleEl.textContent = `Invoice #${invNo}`;
+    if (titleEl) titleEl.textContent = `Bill #${invNo}`;
 
     const bodyEl = document.getElementById('invoice-detail-body');
     if (!bodyEl) return;
 
+    // Generate high-res PNG invoice preview so it looks 100% proportional on mobile & can be shared as an image
+    const invoiceImageUrl = await generateInvoiceCanvasDataUrl(inv);
+
     bodyEl.innerHTML = `
       <!-- Top Action Bar (Hidden on Print) -->
-      <div class="invoice-action-bar no-print">
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button type="button" class="btn-print-invoice" id="btn-modal-print-invoice">
-            <span>&#128424;</span> <span>Print Single-Page Invoice</span>
+      <div class="invoice-action-bar no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; width: 100%;">
+          <button type="button" class="btn-whatsapp" id="btn-modal-whatsapp-invoice" style="flex: 1 1 200px; justify-content: center;">
+            <span>&#128247;</span> <span>Share Invoice Image on WhatsApp</span>
           </button>
-          <button type="button" class="btn-whatsapp" id="btn-modal-whatsapp-invoice">
-            <span>&#128172;</span> <span>Share on WhatsApp</span>
+          <button type="button" class="btn-print-invoice" id="btn-modal-print-invoice" style="flex: 1 1 150px; justify-content: center;">
+            <span>&#128424;</span> <span>Print (1 Page)</span>
           </button>
-          ${!isCancelled ? `<button type="button" class="btn-danger small" id="btn-modal-reverse-invoice" data-id="${inv.id}">Reverse / Delete</button>` : ''}
+          <button type="button" class="btn-ghost small" id="btn-modal-download-img" style="flex: 1 1 140px; justify-content: center; font-weight:800;">
+            <span>&#11015;</span> <span>Save Image</span>
+          </button>
+          ${!isCancelled ? `<button type="button" class="btn-danger small" id="btn-modal-reverse-invoice" data-id="${inv.id}" style="flex: 0 0 auto;">Delete Bill</button>` : ''}
         </div>
-        <span class="badge ${isCancelled ? 'danger' : (status === 'Paid' ? 'success' : 'warning')}" style="font-size: 0.85rem; padding: 6px 14px;">
-          ${escapeHtml(status.toUpperCase())}
-        </span>
       </div>
 
-      <!-- Printable Single-Page Invoice Sheet -->
+      <!-- Visual High-Resolution Invoice Image Preview (Fits 100% on Mobile & Desktop) -->
+      <div class="no-print" style="background: #e2e8f0; padding: 10px; border-radius: 16px; margin-bottom: 12px; text-align: center;">
+        <img src="${invoiceImageUrl}" alt="Invoice ${escapeHtml(invNo)}" style="width: 100%; max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15); display: block; margin: 0 auto;">
+        <div style="font-size: 0.78rem; color: #475569; margin-top: 8px; font-weight: 700;">
+          Tip: Tap "Share Invoice Image on WhatsApp" above to send this exact bill image on Normal WhatsApp or WhatsApp Business.
+        </div>
+      </div>
+
+      <!-- Printable Single-Page Invoice Sheet (Used when printing to A4 Paper / PDF) -->
       <div class="print-invoice-sheet" id="printable-invoice-area">
         <div class="inv-top-header">
           <div class="inv-brand-block">
@@ -795,7 +1111,6 @@ async function openInvoiceDetailModal(invoiceId) {
           </div>
         </div>
 
-        <!-- Customer & Transaction Info Grid -->
         <div class="inv-info-grid">
           <div class="inv-info-card">
             <div class="inv-info-label">Customer Details</div>
@@ -811,7 +1126,6 @@ async function openInvoiceDetailModal(invoiceId) {
           </div>
         </div>
 
-        <!-- Purchased Products Table (Clearly Shows Category, Brand, Model, Specs, Qty, Price, Total) -->
         <table class="inv-items-table">
           <thead>
             <tr>
@@ -835,32 +1149,21 @@ async function openInvoiceDetailModal(invoiceId) {
               return `
                 <tr>
                   <td style="font-weight: 800; color: #64748b;">${idx + 1}</td>
-                  <td>
-                    <span class="inv-category-pill">${escapeHtml(it.categoryName)}</span>
-                  </td>
-                  <td style="font-weight: 800; color: #0f172a;">
-                    ${escapeHtml(it.companyName)}
-                  </td>
+                  <td><span class="inv-category-pill">${escapeHtml(it.categoryName)}</span></td>
+                  <td style="font-weight: 800; color: #0f172a;">${escapeHtml(it.companyName)}</td>
                   <td>
                     <div class="inv-product-title">${escapeHtml(it.modelName)}</div>
                     ${extraSpecs ? `<div class="inv-product-specs">${extraSpecs}</div>` : ''}
                   </td>
-                  <td style="text-align: center; font-weight: 900; font-size: 0.92rem;">
-                    ${it.quantity}
-                  </td>
-                  <td style="text-align: right; font-weight: 700;">
-                    ${formatUnmaskedPKR(it.unitPrice)}
-                  </td>
-                  <td style="text-align: right; font-weight: 900; color: #0f172a;">
-                    ${formatUnmaskedPKR(it.lineTotal)}
-                  </td>
+                  <td style="text-align: center; font-weight: 900; font-size: 0.92rem;">${it.quantity}</td>
+                  <td style="text-align: right; font-weight: 700;">${formatUnmaskedPKR(it.unitPrice)}</td>
+                  <td style="text-align: right; font-weight: 900; color: #0f172a;">${formatUnmaskedPKR(it.lineTotal)}</td>
                 </tr>
               `;
             }).join('')}
           </tbody>
         </table>
 
-        <!-- Totals & Warranty Terms -->
         <div class="inv-summary-section">
           <div class="inv-terms-box">
             <strong style="color: #0f172a; display: block; margin-bottom: 3px;">Customer Acknowledgement &amp; Warranty Policy:</strong>
@@ -893,6 +1196,7 @@ async function openInvoiceDetailModal(invoiceId) {
 
     document.getElementById('btn-modal-print-invoice')?.addEventListener('click', triggerSinglePagePrint);
     document.getElementById('btn-modal-whatsapp-invoice')?.addEventListener('click', () => shareInvoiceOnWhatsApp(inv));
+    document.getElementById('btn-modal-download-img')?.addEventListener('click', () => downloadInvoiceImage(inv));
     document.getElementById('btn-modal-reverse-invoice')?.addEventListener('click', () => {
       UI.closeModal('invoice-detail-modal');
       openReverseSaleModal(inv.id);
@@ -915,39 +1219,71 @@ function openReverseSaleModal(invoiceId) {
 }
 
 // ==========================================
-// 5. RECENT INVOICES & KPIs
+// 5. RECENT INVOICES & KPIs (Today, Last 7 Days, This Month, All Time)
 // ==========================================
+function getSalesDateRanges() {
+  const now = new Date();
+  const toISO = (dt) => `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+  const today = toISO(now);
+
+  const dWeek = new Date(now);
+  dWeek.setDate(now.getDate() - 6); // Inclusive 7 days (today + previous 6 days)
+  const weekStart = toISO(dWeek);
+
+  const monthStart = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+  return { today, weekStart, monthStart };
+}
+
 function renderSalesKPIs() {
-  const d = new Date();
-  const localToday = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const { today, weekStart, monthStart } = getSalesDateRanges();
 
-  const dWeek = new Date();
-  dWeek.setDate(dWeek.getDate() - 7);
-  const lastWeekDate = `${dWeek.getFullYear()}-${String(dWeek.getMonth() + 1).padStart(2, '0')}-${String(dWeek.getDate()).padStart(2, '0')}`;
-
-  const dMonth = new Date();
-  dMonth.setDate(dMonth.getDate() - 30);
-  const lastMonthDate = `${dMonth.getFullYear()}-${String(dMonth.getMonth() + 1).padStart(2, '0')}-${String(dMonth.getDate()).padStart(2, '0')}`;
-
-  let todayTotal = 0, weekTotal = 0, monthTotal = 0;
+  let todayTotal = 0, todayCount = 0;
+  let weekTotal = 0, weekCount = 0;
+  let monthTotal = 0, monthCount = 0;
+  let allTotal = 0, allCount = 0;
 
   salesState.invoices.forEach(inv => {
     if (inv.status === 'Cancelled') return;
     const rawVal = inv.invoice_date || inv.transaction_at || '';
     const date = (rawVal.match(/\d{4}-\d{2}-\d{2}/) || [''])[0];
+    const amt = Number(inv.total_amount || 0);
 
-    if (date === localToday) todayTotal += Number(inv.total_amount || 0);
-    if (date >= lastWeekDate) weekTotal += Number(inv.total_amount || 0);
-    if (date >= lastMonthDate) monthTotal += Number(inv.total_amount || 0);
+    allTotal += amt;
+    allCount += 1;
+
+    if (date === today) {
+      todayTotal += amt;
+      todayCount += 1;
+    }
+    if (date >= weekStart && date <= today) {
+      weekTotal += amt;
+      weekCount += 1;
+    }
+    if (date >= monthStart && date <= today) {
+      monthTotal += amt;
+      monthCount += 1;
+    }
   });
 
   const kpiToday = document.getElementById('kpi-today');
   const kpiWeek = document.getElementById('kpi-week');
   const kpiMonth = document.getElementById('kpi-month');
+  const kpiAll = document.getElementById('kpi-all');
 
   if (kpiToday) kpiToday.innerHTML = UI.currencyHTML(todayTotal);
   if (kpiWeek) kpiWeek.innerHTML = UI.currencyHTML(weekTotal);
   if (kpiMonth) kpiMonth.innerHTML = UI.currencyHTML(monthTotal);
+  if (kpiAll) kpiAll.innerHTML = UI.currencyHTML(allTotal);
+
+  const noteToday = document.getElementById('kpi-today-note');
+  const noteWeek = document.getElementById('kpi-week-note');
+  const noteMonth = document.getElementById('kpi-month-note');
+  const noteAll = document.getElementById('kpi-all-note');
+
+  if (noteToday) noteToday.textContent = `${todayCount} bill${todayCount === 1 ? '' : 's'} today`;
+  if (noteWeek) noteWeek.textContent = `${weekCount} bill${weekCount === 1 ? '' : 's'} (${weekStart} to ${today})`;
+  if (noteMonth) noteMonth.textContent = `${monthCount} bill${monthCount === 1 ? '' : 's'} this month`;
+  if (noteAll) noteAll.textContent = `${allCount} total bill${allCount === 1 ? '' : 's'} in branch`;
 }
 
 let salesHistoryMode = 'today';
@@ -958,32 +1294,48 @@ async function loadRecentInvoices() {
   const startEl = document.getElementById('invoice-start-date');
   const endEl = document.getElementById('invoice-end-date');
 
-  const d = new Date();
-  const localToday = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const { today, weekStart, monthStart } = getSalesDateRanges();
 
   const uiStatus = statusEl ? statusEl.value : '';
   const customer = customerEl ? customerEl.value.trim() : '';
   let start_date = startEl ? startEl.value : '';
   let end_date = endEl ? endEl.value : '';
 
-  const btnToday = document.getElementById('btn-today-sales');
-  const btnAll = document.getElementById('btn-show-all-sales');
+  const modeButtons = {
+    today: document.getElementById('btn-today-sales'),
+    week: document.getElementById('btn-week-sales'),
+    month: document.getElementById('btn-month-sales'),
+    all: document.getElementById('btn-show-all-sales')
+  };
+
+  Object.entries(modeButtons).forEach(([key, btn]) => {
+    if (!btn) return;
+    const isAct = salesHistoryMode === key;
+    btn.classList.toggle('active', isAct);
+    btn.style.borderColor = isAct ? 'var(--blue)' : '';
+    btn.style.fontWeight = isAct ? '800' : 'normal';
+  });
 
   if (salesHistoryMode === 'today') {
-    start_date = localToday;
-    end_date = localToday;
-    if (startEl) startEl.value = localToday;
-    if (endEl) endEl.value = localToday;
-    if (btnToday) { btnToday.style.borderColor = 'var(--blue)'; btnToday.style.fontWeight = '800'; }
-    if (btnAll) { btnAll.style.borderColor = ''; btnAll.style.fontWeight = 'normal'; }
+    start_date = today;
+    end_date = today;
+    if (startEl) startEl.value = today;
+    if (endEl) endEl.value = today;
+  } else if (salesHistoryMode === 'week') {
+    start_date = weekStart;
+    end_date = today;
+    if (startEl) startEl.value = weekStart;
+    if (endEl) endEl.value = today;
+  } else if (salesHistoryMode === 'month') {
+    start_date = monthStart;
+    end_date = today;
+    if (startEl) startEl.value = monthStart;
+    if (endEl) endEl.value = today;
   } else if (salesHistoryMode === 'all') {
     start_date = '';
     end_date = '';
-    if (btnToday) { btnToday.style.borderColor = ''; btnToday.style.fontWeight = 'normal'; }
-    if (btnAll) { btnAll.style.borderColor = 'var(--blue)'; btnAll.style.fontWeight = '800'; }
-  } else {
-    if (btnToday) { btnToday.style.borderColor = ''; btnToday.style.fontWeight = 'normal'; }
-    if (btnAll) { btnAll.style.borderColor = ''; btnAll.style.fontWeight = 'normal'; }
+    if (startEl) startEl.value = '';
+    if (endEl) endEl.value = '';
   }
 
   const queryStatus = (uiStatus === 'Active' || uiStatus === '') ? '' : uiStatus;
@@ -1370,16 +1722,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // History Mode Controls
+  // History Mode Controls (Buttons + Clickable Top KPI Cards)
   document.getElementById('btn-today-sales')?.addEventListener('click', async () => {
     salesHistoryMode = 'today';
+    await loadRecentInvoices();
+  });
+  document.getElementById('btn-week-sales')?.addEventListener('click', async () => {
+    salesHistoryMode = 'week';
+    await loadRecentInvoices();
+  });
+  document.getElementById('btn-month-sales')?.addEventListener('click', async () => {
+    salesHistoryMode = 'month';
     await loadRecentInvoices();
   });
   document.getElementById('btn-show-all-sales')?.addEventListener('click', async () => {
     salesHistoryMode = 'all';
     await loadRecentInvoices();
   });
+  document.querySelectorAll('[data-kpi-period]').forEach(card => {
+    card.addEventListener('click', async () => {
+      salesHistoryMode = card.getAttribute('data-kpi-period') || 'today';
+      await loadRecentInvoices();
+    });
+  });
   document.getElementById('btn-refresh-history')?.addEventListener('click', async () => {
+    API.clearCache();
     await loadRecentInvoices();
   });
   document.getElementById('invoice-filter-form')?.addEventListener('submit', async (e) => {

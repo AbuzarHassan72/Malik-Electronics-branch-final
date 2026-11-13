@@ -211,9 +211,42 @@ const SessionManager = {
 // 2. API CLIENT WITH AUTH & SESSION EXPIRY INTERCEPTOR
 // ==========================================================================
 const API = {
+  cachePrefix: 'malik_fast_cache_v1_',
+  cacheTTL: 120 * 1000, // 2 minutes instant navigation cache
+
+  clearCache() {
+    try {
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.startsWith(this.cachePrefix)) sessionStorage.removeItem(k);
+      });
+    } catch (_) {}
+  },
+
   async request(url, options = {}) {
+    const method = (options.method || 'GET').toUpperCase();
     const token = localStorage.getItem('malik_token');
-    const branchId = getActiveBranchCookie();
+    const branchId = getActiveBranchCookie() || '1';
+    const priceUnlocked = localStorage.getItem('malik_price_unlocked') || '0';
+    const cacheKey = `${this.cachePrefix}${branchId}_${priceUnlocked}_${url}`;
+
+    // If any write operation occurs, clear cached GET responses immediately
+    if (method !== 'GET') {
+      this.clearCache();
+    } else if (!options.skipCache) {
+      try {
+        const cachedRaw = sessionStorage.getItem(cacheKey);
+        if (cachedRaw) {
+          const parsed = JSON.parse(cachedRaw);
+          if (parsed && (Date.now() - parsed.ts) < this.cacheTTL) {
+            // Return cached data immediately for 0ms navigation, refresh silently in background if > 8s old
+            if ((Date.now() - parsed.ts) > 8000) {
+              this.request(url, { ...options, skipCache: true }).catch(() => {});
+            }
+            return parsed.data;
+          }
+        }
+      } catch (_) {}
+    }
 
     const headers = {
       ...(options.headers || {})
@@ -250,6 +283,12 @@ const API = {
     if (!response.ok) {
       const msg = (data && (data.detail || data.message || data.error)) || `Request failed (${response.status})`;
       throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    }
+
+    if (method === 'GET' && contentType.includes('application/json')) {
+      try {
+        sessionStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+      } catch (_) {}
     }
 
     return data;
